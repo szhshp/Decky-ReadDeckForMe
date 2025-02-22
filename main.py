@@ -5,11 +5,60 @@ import os
 # and add the `decky-loader/plugin/imports` path to `python.analysis.extraPaths` in `.vscode/settings.json`
 import decky
 import asyncio
+import subprocess
 
 class Plugin:
-    # A normal method. It can be called from the TypeScript side using @decky/api.
-    async def add(self, left: int, right: int) -> int:
-        return left + right
+    async def ocr_latest(self) -> dict:
+        try:
+            files = await self.get_file_list()
+            decky.logger.info(f"files: {files}")
+            # Get the latest file
+            latest_file = files["output"].split("\n")[0]
+            decky.logger.info(f"latest_file: {latest_file}")
+
+            decky.logger.info("Running OCR")
+            # TODO: Move tesseract to bin
+            command = f"/home/deck/Downloads/tesseract {latest_file} /home/deck/homebrew/data/decky-rifm/cache -l chi_sim"
+            # Execute the command using subprocess.run
+            result = subprocess.run(command, shell=True, capture_output=True, text=True, check=True)
+            decky.logger.info(f"result: {result}")
+
+            return {"status": "success", "output": result.stdout}
+        except subprocess.CalledProcessError as e:
+            decky.logger.error(f"Command failed with error: {e}")
+            decky.logger.error(f"Return code: {e.returncode}")
+            decky.logger.error(f"Output: {e.output}")
+            decky.logger.error(f"Stderr: {e.stderr}")
+            return {"status": "error", "output": str(e)}
+
+    async def get_file_list(self) -> dict:
+        try:
+            decky.logger.info("Running 'find' command")
+            command = "find /home/deck/Desktop/_Screenshot -type f -name '*.png' "
+            # Execute the command using subprocess.run
+            result = subprocess.run(command, shell=True, capture_output=True, text=True, check=True)
+            # Get the output and split by lines
+            file_paths = result.stdout.strip().split("\n")
+            # Log full file paths
+            decky.logger.info(f"file_paths: {file_paths}")
+
+            return {"status": "success", "output": result.stdout}
+        except subprocess.CalledProcessError as e:
+            decky.logger.error(f"Command failed with error: {e}")
+            return {"status": "error", "output": str(e)}
+
+
+    async def backend_addition(self, parameter_a: int, parameter_b: int) -> str:
+        return str(parameter_a + parameter_b)
+
+    # # A normal method. It can be called from the TypeScript side using @decky/api.
+    # async def add(self, left: int, right: int) -> int:
+    #     decky.logger.info("33333333")
+    #     return left + right
+
+    # async def add2(self, left: int, right: int) -> int:
+    #     decky.logger.info("22222229")
+    #     return 19
 
     async def long_running(self):
         await asyncio.sleep(15)
@@ -19,6 +68,10 @@ class Plugin:
     # Asyncio-compatible long-running code, executed in a task when the plugin is loaded
     async def _main(self):
         self.loop = asyncio.get_event_loop()
+
+        # Set the TESSDATA_PREFIX environment variable
+        # TODO: change data path
+        os.environ['TESSDATA_PREFIX'] = '/home/deck/Downloads/tessdata'
         decky.logger.info("Hello World!")
 
     # Function called first during the unload process, utilize this to handle your plugin being stopped, but not
@@ -40,7 +93,7 @@ class Plugin:
     async def _migration(self):
         decky.logger.info("Migrating")
         # Here's a migration example for logs:
-        # - `~/.config/decky-template/template.log` will be migrated to `decky.decky_LOG_DIR/template.log`
+        # - `~/.config/decky-template/template.log` will be milgrated to `decky.decky_LOG_DIR/template.log`
         decky.migrate_logs(os.path.join(decky.DECKY_USER_HOME,
                                                ".config", "decky-template", "template.log"))
         # Here's a migration example for settings:

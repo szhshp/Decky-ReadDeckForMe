@@ -10,21 +10,16 @@ import {
   callable,
   definePlugin,
   toaster,
+  call,
   // routerHook
 } from "@decky/api"
 import { useState } from "react";
 import { FaShip } from "react-icons/fa";
 
-// import logo from "../assets/logo.png";
+import logo from "../assets/logo.png";
 
-// This function calls the python function "add", which takes in two numbers and returns their sum (as a number)
-// Note the type annotations:
-//  the first one: [first: number, second: number] is for the arguments
-//  the second one: number is for the return value
 const add = callable<[first: number, second: number], number>("add");
-
-// This function calls the python function "start_timer", which takes in no arguments and returns nothing.
-// It starts a (python) timer which eventually emits the event 'timer_event'
+const add2 = callable<[first: number, second: number], number>("add2");
 const startTimer = callable<[], void>("start_timer");
 
 function Content() {
@@ -35,8 +30,31 @@ function Content() {
     setResult(result);
   };
 
+
+  const onClick2 = async () => {
+    const result = await add2(Math.random(), Math.random());
+    setResult(result);
+  };
+
   return (
     <PanelSection title="Panel Section">
+      <PanelSectionRow>
+        <ButtonItem
+          layout="below"
+          onClick={async () => await call('get_file_list')}
+        >
+          Get File List
+        </ButtonItem>
+      </PanelSectionRow>
+
+      <PanelSectionRow>
+        <ButtonItem
+          layout="below"
+          onClick={async () => await call('ocr_latest')}
+        >
+          OCR Latest
+        </ButtonItem>
+      </PanelSectionRow>
       <PanelSectionRow>
         <ButtonItem
           layout="below"
@@ -54,11 +72,20 @@ function Content() {
         </ButtonItem>
       </PanelSectionRow>
 
-      {/* <PanelSectionRow>
+      <PanelSectionRow>
+        <ButtonItem
+          layout="below"
+          onClick={onClick2}
+        >
+          {result ?? "Add two numbers via Python"}
+        </ButtonItem>
+      </PanelSectionRow>
+
+      <PanelSectionRow>
         <div style={{ display: "flex", justifyContent: "center" }}>
           <img src={logo} />
         </div>
-      </PanelSectionRow> */}
+      </PanelSectionRow>
 
       {/*<PanelSectionRow>
         <ButtonItem

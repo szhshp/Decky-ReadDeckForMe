@@ -11,6 +11,9 @@ importers:
       '@decky/api':
         specifier: ^1.1.2
         version: 1.1.2
+      '@rollup/rollup-linux-x64-musl':
+        specifier: ^4.34.8
+        version: 4.34.8
       react-icons:
         specifier: ^5.3.0
         version: 5.3.0(react@18.3.1)
@@ -223,6 +226,10 @@ packages:
     cpu: [x64]
     os: [linux]
     libc: [musl]
+
+  '@rollup/rollup-linux-x64-musl@4.34.8':
+    resolution: {integrity: sha512-SCXcP0ZpGFIe7Ge+McxY5zKxiEI5ra+GT3QRxL0pMMtxPfpyLAKleZODi1zdRHkz5/BhueUrYtYVgubqe9JBNQ==}
+    os: [linux]
 
   '@rollup/rollup-win32-arm64-msvc@4.22.5':
     resolution: {integrity: sha512-RXT8S1HP8AFN/Kr3tg4fuYrNxZ/pZf1HemC5Tsddc6HzgGnJm0+Lh5rAHJkDuW3StI0ynNXukidROMXYl6ew8w==}
@@ -1066,6 +1073,8 @@ snapshots:
 
   '@rollup/rollup-linux-x64-musl@4.22.5':
     optional: true
+
+  '@rollup/rollup-linux-x64-musl@4.34.8': {}
 
   '@rollup/rollup-win32-arm64-msvc@4.22.5':
     optional: true
