@@ -46,5 +46,17 @@
         "react-dom"
       ]
     }
-  }
+  },
+  "remote_binary": [
+    {
+      "name": "chi_sim.traineddata",
+      "url": "https://github.com/tesseract-ocr/tessdata/raw/refs/heads/main/chi_sim.traineddata",
+      "sha256hash": "fc05d89ab31d8b4e226910f16a8bcbf78e43bae3e2580bb5feefd052efdab363"
+    },
+    {
+      "name": "eng.traineddata",
+      "url": "https://github.com/tesseract-ocr/tessdata/raw/refs/heads/main/eng.traineddata",
+      "sha256hash": "daa0c97d651c19fba3b25e81317cd697e9908c8208090c94c3905381c23fc047"
+    }
+  ]
 }
