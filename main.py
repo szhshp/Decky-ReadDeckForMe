@@ -6,6 +6,7 @@ import os
 import decky
 import asyncio
 import subprocess
+import base64
 
 PLUGIN_PATH = decky.DECKY_PLUGIN_DIR
 BIN_PATH = os.path.join(decky.DECKY_PLUGIN_DIR, "bin")
@@ -62,6 +63,30 @@ class Plugin:
             decky.logger.error(f"Stderr: {e.stderr}")
             return {"status": "error", "output": str(e)}
 
+    async def get_latest_file(self) -> dict:
+        decky.logger.info(f"123123")
+        try:
+            files = await self.get_file_list()
+            decky.logger.info(f"files: {files}")
+            # Get the latest file
+            latest_file = files["output"].split("\n")[0]
+            decky.logger.info(f"latest_file: {latest_file}")
+
+            # Read the file content and encode it in base64
+            with open(latest_file, "rb") as file:
+                file_content = file.read()
+                file_base64 = base64.b64encode(file_content).decode('utf-8')
+            
+            decky.logger.info(f"file_base64: {file_base64}")
+
+            return {"status": "success", "output": latest_file, "base64": file_base64}
+        except subprocess.CalledProcessError as e:
+            decky.logger.error(f"Command failed with error: {e}")
+            return {"status": "error", "output": str(e)}
+        except Exception as e:
+            decky.logger.error(f"An error occurred: {e}")
+            return {"status": "error", "output": str(e)}
+
     async def get_file_list(self) -> dict:
         try:
             decky.logger.info("Running 'find' command")
@@ -89,17 +114,17 @@ class Plugin:
     async def _main(self):
         self.loop = asyncio.get_event_loop()
 
-        # Check if /bin/piper exists
-        if not os.path.exists(f"{BIN_PATH}/piper"):
-            # Extract /bin/file to /bin
-            command = f"tar -xvf {BIN_PATH}/piper_linux_x86_64.tar.gz -C {BIN_PATH}"
-            result = subprocess.run(command, shell=True, capture_output=True, text=True, check=True)
-            decky.logger.info(f"Extraction result: {result.stdout}")
-        else:
-            decky.logger.info("/bin/piper already exists, skipping extraction")
+        # # Check if /bin/piper exists
+        # if not os.path.exists(f"{BIN_PATH}/piper"):
+        #     # Extract /bin/file to /bin
+        #     command = f"tar -xvf {BIN_PATH}/piper_linux_x86_64.tar.gz -C {BIN_PATH}"
+        #     result = subprocess.run(command, shell=True, capture_output=True, text=True, check=True)
+        #     decky.logger.info(f"Extraction result: {result.stdout}")
+        # else:
+        #     decky.logger.info("/bin/piper already exists, skipping extraction")
 
         # Set the TESSDATA_PREFIX environment variable
-        os.environ['TESSDATA_PREFIX'] = BIN_PATH
+        # os.environ['TESSDATA_PREFIX'] = BIN_PATH
         decky.logger.info("Hello World!")
 
     async def _unload(self):

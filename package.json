@@ -36,6 +36,7 @@
   },
   "dependencies": {
     "@decky/api": "^1.1.2",
+    "openai": "^4.85.4",
     "react-icons": "^5.3.0",
     "tslib": "^2.7.0"
   },
@@ -46,33 +47,5 @@
         "react-dom"
       ]
     }
-  },
-  "remote_binary_bundling": false,
-  "remote_binary": [
-    {
-      "name": "tesseract",
-      "url": "https://gh.llkk.cc/https://github.com/DanielMYT/tesseract-static/releases/download/tesseract-5.5.0/tesseract",
-      "sha256hash": "102f39b771904f529fb32f66d746d69bf1cbb11461ebe939c336afbbecabd725"
-    },
-    {
-      "name": "chi_sim.traineddata",
-      "url": "https://gh.llkk.cc/https://raw.githubusercontent.com/tesseract-ocr/tessdata/refs/heads/main/chi_sim.traineddata",
-      "sha256hash": "fc05d89ab31d8b4e226910f16a8bcbf78e43bae3e2580bb5feefd052efdab363"
-    },
-    {
-      "name": "piper_linux_x86_64.tar.gz",
-      "url": "https://gh.llkk.cc/https://github.com/rhasspy/piper/releases/download/2023.11.14-2/piper_linux_x86_64.tar.gz",
-      "sha256hash": "a50cb45f355b7af1f6d758c1b360717877ba0a398cc8cbe6d2a7a3a26e225992"
-    },
-    {
-      "name": "zh_CN-huayan-medium.onnx",
-      "url": "https://huggingface.co/rhasspy/piper-voices/resolve/v1.0.0/zh/zh_CN/huayan/medium/zh_CN-huayan-medium.onnx",
-      "sha256hash": "d30b143fac66d821a1285aa013295adf5cd129d3cc11d70334e51c7b20662c37"
-    },
-    {
-      "name": "zh_CN-huayan-medium.onnx.json",
-      "url": "https://huggingface.co/rhasspy/piper-voices/resolve/v1.0.0/zh/zh_CN/huayan/medium/zh_CN-huayan-medium.onnx.json",
-      "sha256hash": "5521dcb09adf68a9bee289032f7f5af18d29bff020953429b5d223ec1f881816"
-    }
-  ]
+  }
 }
