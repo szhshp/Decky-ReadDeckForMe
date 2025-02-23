@@ -20,7 +20,7 @@ import logo from "../assets/logo.png";
 
 // const add = callable<[first: number, second: number], number>("add");
 // const add2 = callable<[first: number, second: number], number>("add2");
-const ocr_latest = callable<[], { status: string, output: string }>("ocr_latest");
+const ocr_latest = callable<[], { status: string, output: string, base64: string }>("ocr_latest");
 const startTimer = callable<[], void>("start_timer");
 
 function Content() {
@@ -41,26 +41,23 @@ function Content() {
   const ocr = async () => {
     console.log("ocr");
     const result = await ocr_latest();
+    console.log('result: ', result);
     setContent(result.output);
 
-
-    const utterance = new SpeechSynthesisUtterance("Hello, world!");
-    utterance.lang = "en-US"; // Set language
-    utterance.rate = 1; // Set rate
-    utterance.pitch = 1; // Set pitch
-    utterance.volume = 1; // Set volume
-
-    window.speechSynthesis.speak(utterance);
   };
 
   return (
     <PanelSection title="Panel Section">
       <PanelSectionRow>
+        {/* <iframe
+          src="https://platform.moonshot.cn/docs/guide/start-using-kimi-api"
+          style={{ width: "100%", height: "500px", border: "none" }}
+        ></iframe> */}
         <ButtonItem
           layout="below"
           onClick={async () => await call('get_file_list')}
         >
-          Get File List 130
+          Get File List 140
         </ButtonItem>
       </PanelSectionRow>
 

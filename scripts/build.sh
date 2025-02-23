@@ -1,22 +1,26 @@
 # Ensure the script is run from [ the root of the project ], not from the /scripts directory
 pnpm run build
 
-cd ..
-
 timestamp=$(date +"%Y%m%d%H%M%S")
-filname="PLUGIN.zip"
+filname="decky-rifm-debug.zip"
 
-echo "Creating archive $filname"
-zip -r $filname decky-rifm \
-  -x "decky-rifm/node_modules/*" \
-  "decky-rifm/.git/*" \
-  "decky-rifm/.gitignore" \
-  "decky-rifm/.gitattributes" \
-  "decky-rifm/src" \
-  "decky-rifm/.gitmodules"
+
+rm -r decky-rifm-debug
+mkdir -p decky-rifm-debug/dist
+
+cp -r dist/* decky-rifm-debug/dist
+cp package.json decky-rifm-debug/
+cp plugin.json decky-rifm-debug/
+cp main.py decky-rifm-debug/ 2>/dev/null || :
+cp README.md decky-rifm-debug/ 2>/dev/null || :
+cp LICENSE decky-rifm-debug/ 2>/dev/null || cp LICENSE.md decky-rifm-debug/ 2>/dev/null || :
+
+zip -r $filname decky-rifm-debug
 
 scp $filname deck@192.168.1.9:~/_PLUGIN_DEBUG/${filename}
+
+
+# ssh deck@192.168.1.9 "cd /home/deck/_PLUGIN_DEBUG; unzip -o PLUGIN.zip -d /home/deck/homebrew/plugins"
+
 rm $filname
-
-
-ssh deck@192.168.1.9 "cd /home/deck/_PLUGIN_DEBUG; unzip -o PLUGIN.zip -d /home/deck/homebrew/plugins"
+rm -r decky-rifm-debug
