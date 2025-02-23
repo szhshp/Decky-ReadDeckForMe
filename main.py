@@ -17,8 +17,7 @@ class Plugin:
             decky.logger.info(f"latest_file: {latest_file}")
 
             decky.logger.info("Running OCR")
-            # TODO: Move tesseract to bin
-            command = f"/home/deck/Downloads/tesseract {latest_file} /home/deck/homebrew/data/decky-rifm/cache -l chi_sim"
+            command = f"/home/deck/homebrew/plugins/decky-rifm/bin/tesseract {latest_file} stdout -l eng"
             # Execute the command using subprocess.run
             result = subprocess.run(command, shell=True, capture_output=True, text=True, check=True)
             decky.logger.info(f"result: {result}")

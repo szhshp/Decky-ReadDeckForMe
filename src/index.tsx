@@ -18,22 +18,39 @@ import { FaShip } from "react-icons/fa";
 
 import logo from "../assets/logo.png";
 
-const add = callable<[first: number, second: number], number>("add");
-const add2 = callable<[first: number, second: number], number>("add2");
+// const add = callable<[first: number, second: number], number>("add");
+// const add2 = callable<[first: number, second: number], number>("add2");
+const ocr_latest = callable<[], { status: string, output: string }>("ocr_latest");
 const startTimer = callable<[], void>("start_timer");
 
 function Content() {
-  const [result, setResult] = useState<number | undefined>();
+  // const [result, setResult] = useState<number | undefined>();
+  const [content, setContent] = useState<string | undefined>();
 
-  const onClick = async () => {
-    const result = await add(Math.random(), Math.random());
-    setResult(result);
-  };
+  // const onClick = async () => {
+  //   const result = await add(Math.random(), Math.random());
+  //   setResult(result);
+  // };
 
 
-  const onClick2 = async () => {
-    const result = await add2(Math.random(), Math.random());
-    setResult(result);
+  // const onClick2 = async () => {
+  //   const result = await add2(Math.random(), Math.random());
+  //   setResult(result);
+  // };
+
+  const ocr = async () => {
+    console.log("ocr");
+    const result = await ocr_latest();
+    setContent(result.output);
+
+
+    const utterance = new SpeechSynthesisUtterance("Hello, world!");
+    utterance.lang = "en-US"; // Set language
+    utterance.rate = 1; // Set rate
+    utterance.pitch = 1; // Set pitch
+    utterance.volume = 1; // Set volume
+
+    window.speechSynthesis.speak(utterance);
   };
 
   return (
@@ -43,26 +60,28 @@ function Content() {
           layout="below"
           onClick={async () => await call('get_file_list')}
         >
-          Get File List
+          Get File List 130
         </ButtonItem>
       </PanelSectionRow>
 
       <PanelSectionRow>
         <ButtonItem
           layout="below"
-          onClick={async () => await call('ocr_latest')}
+          onClick={ocr}
         >
           OCR Latest
         </ButtonItem>
       </PanelSectionRow>
-      <PanelSectionRow>
+
+      {/* <PanelSectionRow>
         <ButtonItem
           layout="below"
           onClick={onClick}
         >
           {result ?? "Add two numbers via Python"}
         </ButtonItem>
-      </PanelSectionRow>
+      </PanelSectionRow> */}
+
       <PanelSectionRow>
         <ButtonItem
           layout="below"
@@ -72,13 +91,20 @@ function Content() {
         </ButtonItem>
       </PanelSectionRow>
 
-      <PanelSectionRow>
+      {/*      <PanelSectionRow>
         <ButtonItem
           layout="below"
           onClick={onClick2}
         >
           {result ?? "Add two numbers via Python"}
         </ButtonItem>
+      </PanelSectionRow>
+*/}
+
+      <PanelSectionRow>
+        <div style={{ display: "flex", justifyContent: "center" }}>
+          {content}
+        </div>
       </PanelSectionRow>
 
       <PanelSectionRow>

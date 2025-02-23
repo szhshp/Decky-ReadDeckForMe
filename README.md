@@ -1,3 +1,27 @@
+
+# Decky Plugin - ReadItForMe 
+
+
+## Development ENV Setup
+
+1. Setup SSH to login without password (Using RSA)
+2. Run `pnpm i` to install dependencies
+3. Run `/script/setup.sh` to build,zip,ship the plugin to decky
+4. Install the plugin in Decky-Loader in Dev mode
+5. Once you can see the `decky-rifm` in `/homebrew/plugins` in Decky-Loader, you can start developing the plugin.
+6. Change the permission of that folder: `sudo chmod -R 777 /decky-rifm` then we can overwrite the files in that folder
+7. Make changes in code, both frontend and backend
+8. Run `/script/build.sh` again to see the changes in Decky-Loader (Possibly you need to reload or click the reinstall button in Decky-Loader)
+
+
+
+
+
+
+
+
+-----------
+
 # Decky Plugin Template [![Chat](https://img.shields.io/badge/chat-on%20discord-7289da.svg)](https://deckbrew.xyz/discord)
 
 Reference example for using [decky-frontend-lib](https://github.com/SteamDeckHomebrew/decky-frontend-lib) (@decky/ui) in a [decky-loader](https://github.com/SteamDeckHomebrew/decky-loader) plugin.
