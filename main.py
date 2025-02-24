@@ -9,29 +9,30 @@ import subprocess
 
 PLUGIN_PATH = decky.DECKY_PLUGIN_DIR
 BIN_PATH = os.path.join(decky.DECKY_PLUGIN_DIR, "bin")
+WAV_PATH = os.path.join(decky.DECKY_PLUGIN_DIR, "dist/assets/cache.wav")
 
 class Plugin:
     async def tts(self, text: str):
+        try:
+            decky.logger.info("Running TTS")
+            command = f'echo "{text}" | {BIN_PATH}/piper/piper --model {BIN_PATH}/en_US-lessac-medium.onnx --debug --output_file {PLUGIN_PATH}/dist/assets/cache.wav'
+            process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+            stdout, stderr = process.communicate()
+            if process.returncode != 0:
+                raise subprocess.CalledProcessError(process.returncode, command, output=stdout, stderr=stderr)
+            decky.logger.info("TTS completed")
+        except subprocess.CalledProcessError as e:
+            decky.logger.error(f"Command failed with error: {e}")
+            decky.logger.error(f"Return code: {e.returncode}")
+            decky.logger.error(f"Output: {e.output}")
+            decky.logger.error(f"Stderr: {e.stderr}")
+
         # Run the command
         try:
-
-            decky.logger.info("Running TTS125")
-            command = f'echo "12345682" | {BIN_PATH}/piper/piper --model {BIN_PATH}/zh_CN-huayan-medium.onnx --output_file {PLUGIN_PATH}/dist/assets/cache.wav'
-            try:
-                await subprocess.run(command, shell=True, capture_output=True, text=True, check=True)
-            except subprocess.CalledProcessError as e:
-                decky.logger.error(f"Command failed with error: {e}")
-                decky.logger.error(f"Return code: {e.returncode}")
-                decky.logger.error(f"Output: {e.output}")
-                decky.logger.error(f"Stderr: {e.stderr}")
-            decky.logger.info("TTS completed")
-
-
-            # decky.logger.info("Playing audio")
-            # # Play the audio
-            # command = f'aplay -r 22050 -f S16_LE -t raw {BIN_PATH}/cache.wav'
-            # await subprocess.run(command, shell=True, capture_output=True, text=True, check=True)
-
+            decky.logger.info("Playing TTS")
+            command = f'paplay {WAV_PATH}'
+            subprocess.run(command, shell=True, capture_output=True, text=True, check=True)
+            decky.logger.info("TTS playback completed")
         except subprocess.CalledProcessError as e:
             decky.logger.error(f"Command failed with error: {e}")
             decky.logger.error(f"Return code: {e.returncode}")
@@ -47,11 +48,10 @@ class Plugin:
             decky.logger.info(f"latest_file: {latest_file}")
 
             decky.logger.info("Running OCR")
-            command = f"{BIN_PATH}/tesseract {latest_file} stdout -l chi_sim"
+            command = f"{BIN_PATH}/tesseract {latest_file} stdout -l eng"
             # Execute the command using subprocess.run
             result = subprocess.run(command, shell=True, capture_output=True, text=True, check=True)
             decky.logger.info(f"result: {result}")
-
             await self.tts(result.stdout)
 
             return {"status": "success", "output": result.stdout}
@@ -98,8 +98,12 @@ class Plugin:
         else:
             decky.logger.info("/bin/piper already exists, skipping extraction")
 
-        # Set the TESSDATA_PREFIX environment variable
+        # OCR: Set the TESSDATA_PREFIX environment variable
         os.environ['TESSDATA_PREFIX'] = BIN_PATH
+
+        # Player: Set the XDG_RUNTIME_DIR environment variable
+        os.environ['XDG_RUNTIME_DIR'] = "/run/user/1000"
+
         decky.logger.info("Hello World!")
 
     async def _unload(self):

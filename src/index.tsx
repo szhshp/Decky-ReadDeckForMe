@@ -26,41 +26,30 @@ const startTimer = callable<[], void>("start_timer");
 function Content() {
   // const [result, setResult] = useState<number | undefined>();
   const [content, setContent] = useState<string | undefined>();
-
-  // const onClick = async () => {
-  //   const result = await add(Math.random(), Math.random());
-  //   setResult(result);
-  // };
+  const [isLoading, setLoading] = useState<boolean>(false);
 
 
-  // const onClick2 = async () => {
-  //   const result = await add2(Math.random(), Math.random());
-  //   setResult(result);
-  // };
+
 
   const ocr = async () => {
     console.log("ocr");
+    setLoading(true);
     const result = await ocr_latest();
     console.log('result: ', result);
-    setContent(result.output);
-
+    // setContent(result.base64);
+    setLoading(false);
   };
 
   return (
     <PanelSection title="Panel Section">
       <PanelSectionRow>
-        {/* <iframe
-          src="https://platform.moonshot.cn/docs/guide/start-using-kimi-api"
-          style={{ width: "100%", height: "500px", border: "none" }}
-        ></iframe> */}
         <ButtonItem
           layout="below"
           onClick={async () => await call('get_file_list')}
         >
-          Get File List 140
+          Get File List {isLoading ? "(loading)" : ""}
         </ButtonItem>
       </PanelSectionRow>
-
       <PanelSectionRow>
         <ButtonItem
           layout="below"
@@ -69,16 +58,6 @@ function Content() {
           OCR Latest
         </ButtonItem>
       </PanelSectionRow>
-
-      {/* <PanelSectionRow>
-        <ButtonItem
-          layout="below"
-          onClick={onClick}
-        >
-          {result ?? "Add two numbers via Python"}
-        </ButtonItem>
-      </PanelSectionRow> */}
-
       <PanelSectionRow>
         <ButtonItem
           layout="below"
@@ -88,27 +67,17 @@ function Content() {
         </ButtonItem>
       </PanelSectionRow>
 
-      {/*      <PanelSectionRow>
-        <ButtonItem
-          layout="below"
-          onClick={onClick2}
-        >
-          {result ?? "Add two numbers via Python"}
-        </ButtonItem>
-      </PanelSectionRow>
-*/}
-
       <PanelSectionRow>
         <div style={{ display: "flex", justifyContent: "center" }}>
-          {content}
+          {content && <img src={`data:image/png;base64,${content}`} alt="OCR Result" />}
         </div>
       </PanelSectionRow>
 
-      <PanelSectionRow>
+      {/* <PanelSectionRow>
         <div style={{ display: "flex", justifyContent: "center" }}>
           <img src={logo} />
         </div>
-      </PanelSectionRow>
+      </PanelSectionRow> */}
 
       {/*<PanelSectionRow>
         <ButtonItem

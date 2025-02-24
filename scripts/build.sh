@@ -17,10 +17,9 @@ cp LICENSE decky-rifm-debug/ 2>/dev/null || cp LICENSE.md decky-rifm-debug/ 2>/d
 
 zip -r $filname decky-rifm-debug
 
-scp $filname deck@192.168.1.9:~/_PLUGIN_DEBUG/${filename}
-
-
-# ssh deck@192.168.1.9 "cd /home/deck/_PLUGIN_DEBUG; unzip -o PLUGIN.zip -d /home/deck/homebrew/plugins"
+scp $filname deck@192.168.1.9:~/_PLUGIN_DEBUG
+ssh deck@192.168.1.9 "unzip -o ~/_PLUGIN_DEBUG/decky-rifm-debug.zip -d /home/deck/homebrew/plugins"
+ssh deck@192.168.1.9 "chmod -R 777 /home/deck/homebrew/plugins/decky-rifm-debug"
 
 rm $filname
 rm -r decky-rifm-debug
