@@ -1,3 +1,4 @@
+/* eslint-disable react/react-in-jsx-scope */
 import {
   ButtonItem,
   PanelSection,
@@ -10,33 +11,38 @@ import {
   callable,
   definePlugin,
   toaster,
-  call,
   // routerHook
 } from "@decky/api"
 import { useState } from "react";
-import { FaShip } from "react-icons/fa";
+import { FaShip, FaCircleNotch } from "react-icons/fa";
 
-import logo from "../assets/logo.png";
-
-// const add = callable<[first: number, second: number], number>("add");
-// const add2 = callable<[first: number, second: number], number>("add2");
-const ocr_latest = callable<[], { status: string, output: string, base64: string }>("ocr_latest");
-const startTimer = callable<[], void>("start_timer");
+const ocr_latest = callable<[], { status: string, output: string }>("ocr_latest");
+const get_latest = callable<[], { status: string, output: string, base64: string }>("get_latest");
+const delete_latest = callable<[], { status: string, output: string }>("delete_latest");
 
 function Content() {
-  // const [result, setResult] = useState<number | undefined>();
   const [content, setContent] = useState<string | undefined>();
-  const [isLoading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
-
-
+  const get_latest_img = async () => {
+    setLoading(true);
+    const result = await get_latest();
+    setContent(result.base64);
+    setLoading(false);
+  };
 
   const ocr = async () => {
     console.log("ocr");
     setLoading(true);
-    const result = await ocr_latest();
-    console.log('result: ', result);
-    // setContent(result.base64);
+    await ocr_latest();
+    setLoading(false);
+  };
+
+  const delete_latest_img = async () => {
+    setLoading(true);
+    const result = await delete_latest();
+    console.log(result);
+    setContent(undefined);
     setLoading(false);
   };
 
@@ -45,33 +51,37 @@ function Content() {
       <PanelSectionRow>
         <ButtonItem
           layout="below"
-          onClick={async () => await call('get_file_list')}
+          onClick={get_latest_img}
+          disabled={loading}
         >
-          Get File List {isLoading ? "(loading)" : ""}
+          Get Latest File {loading && <FaCircleNotch className="spin" />}
         </ButtonItem>
       </PanelSectionRow>
       <PanelSectionRow>
         <ButtonItem
           layout="below"
           onClick={ocr}
+          disabled={loading}
         >
-          OCR Latest
+          OCR Latest {loading && <FaCircleNotch className="spin" />}
         </ButtonItem>
       </PanelSectionRow>
       <PanelSectionRow>
         <ButtonItem
           layout="below"
-          onClick={() => startTimer()}
+          onClick={delete_latest_img}
+          disabled={loading}
         >
-          {"Start Python timer"}
+          Delete Latest {loading && <FaCircleNotch className="spin" />}
         </ButtonItem>
       </PanelSectionRow>
 
-      <PanelSectionRow>
-        <div style={{ display: "flex", justifyContent: "center" }}>
-          {content && <img src={`data:image/png;base64,${content}`} alt="OCR Result" />}
-        </div>
-      </PanelSectionRow>
+      {content &&
+        <PanelSectionRow>
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            <img src={`data:image/png;base64,${content}`} alt="OCR Result" style={{ width: "80vw", border: "1px solid grey" }} />
+          </div>
+        </PanelSectionRow>}
 
       {/* <PanelSectionRow>
         <div style={{ display: "flex", justifyContent: "center" }}>
