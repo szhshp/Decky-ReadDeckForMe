@@ -8,11 +8,12 @@ filname="decky-rifm.zip"
 
 # Remove any existing decky-rifm directory
 rm -r decky-rifm
-# Create the necessary directory structure
-mkdir -p decky-rifm/dist
 
-# Copy the build output to the new directory
+mkdir -p decky-rifm/dist
 cp -r dist/* decky-rifm/dist
+mkdir -p decky-rifm/bin
+cp -r bin/* decky-rifm/bin
+
 # Copy essential files to the new directory
 cp package.json decky-rifm/
 cp plugin.json decky-rifm/

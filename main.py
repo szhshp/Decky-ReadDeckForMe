@@ -10,13 +10,13 @@ import subprocess
 
 PLUGIN_PATH = decky.DECKY_PLUGIN_DIR
 BIN_PATH = os.path.join(decky.DECKY_PLUGIN_DIR, "bin")
-WAV_PATH = os.path.join(decky.DECKY_PLUGIN_DIR, "dist/assets/cache.wav")
+WAV_PATH = os.path.join(decky.DECKY_PLUGIN_DIR, "dist/cache.wav")
 
 class Plugin:
     async def tts(self, text: str):
         try:
             decky.logger.info("Running TTS")
-            command = f'echo "{text}" | {BIN_PATH}/piper/piper --model {BIN_PATH}/zh_CN-huayan-medium.onnx --debug --output_file {WAV_PATH}'
+            command = f'echo "{text}" | {BIN_PATH}/piper/piper --model {BIN_PATH}/en_GB-alba-medium.onnx --debug --output_file {WAV_PATH}'
             process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
             stdout, stderr = process.communicate()
             if process.returncode != 0:
@@ -72,7 +72,7 @@ class Plugin:
 
             with open(latest_file, "rb") as file:
                 encoded_string = base64.b64encode(file.read()).decode('utf-8')
-            decky.logger.info(f"GetLatest: Base64: {encoded_string}")
+            # decky.logger.info(f"GetLatest: Base64: {encoded_string}")
 
             return {"status": "success", "output": latest_file, "base64": encoded_string}
         except subprocess.CalledProcessError as e:
@@ -93,7 +93,7 @@ class Plugin:
             decky.logger.info(f"OCRLatest: Latest_file: {latest_file}")
 
             decky.logger.info("OCRLatest: Running OCR")
-            command = f"{BIN_PATH}/tesseract {latest_file} stdout -l chi_sim"
+            command = f"{BIN_PATH}/tesseract {latest_file} stdout -l eng"
             result = subprocess.run(command, shell=True, capture_output=True, text=True, check=True)
             decky.logger.info(f"OCRLatest: Result: {result.stdout}")
             await self.tts(result.stdout)
