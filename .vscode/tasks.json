@@ -1,0 +1,30 @@
+{
+  // Prefer using Unix-based systems for development
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build",
+      "type": "shell",
+      "group": "build",
+      "detail": "Build plugin with CLI",
+      "command": "${workspaceFolder}/.vscode/build.sh",
+      "problemMatcher": []
+    },
+    {
+      "label": "copyzip",
+      "detail": "Deploy plugin zip to deck",
+      "type": "shell",
+      "group": "build",
+      "command": "scp ${workspaceFolder}/out/${config:filename} ${config:deckuser}@${config:deckip}:/tmp/${config:filename}",
+      "problemMatcher": []
+    },
+    {
+      "label": "showlog",
+      "detail": "Show the latest log from the deck",
+      "type": "shell",
+      "group": "none",
+      "command": "ssh ${config:deckuser}@${config:deckip} \"cd /home/deck/homebrew/logs/decky-rifm; cat \\\"\\$(ls -t | head -n 1)\\\"\"",
+      "problemMatcher": []
+    }
+  ]
+}
