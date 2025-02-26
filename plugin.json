@@ -1,6 +1,6 @@
 {
-  "name": "Decky Plugin Screenshot Reader",
-  "author": "John Doe",
+  "name": "Decky-Read It For Me",
+  "author": "szhshp",
   "flags": [
     "debug",
     "_root"
@@ -11,7 +11,7 @@
       "template",
       "root"
     ],
-    "description": "Decky example plugin.",
+    "description": "A plugin that reads the text on the screen for you.",
     "image": "https://opengraph.githubassets.com/1/SteamDeckHomebrew/PluginLoader"
   }
 }

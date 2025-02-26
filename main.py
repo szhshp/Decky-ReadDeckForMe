@@ -16,7 +16,7 @@ class Plugin:
     async def tts(self, text: str):
         try:
             decky.logger.info("Running TTS")
-            command = f'echo "{text}" | {BIN_PATH}/piper/piper --model {BIN_PATH}/en_US-lessac-medium.onnx --debug --output_file {WAV_PATH}'
+            command = f'echo "{text}" | {BIN_PATH}/piper/piper --model {BIN_PATH}/zh_CN-huayan-medium.onnx --debug --output_file {WAV_PATH}'
             process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
             stdout, stderr = process.communicate()
             if process.returncode != 0:
@@ -93,7 +93,7 @@ class Plugin:
             decky.logger.info(f"OCRLatest: Latest_file: {latest_file}")
 
             decky.logger.info("OCRLatest: Running OCR")
-            command = f"{BIN_PATH}/tesseract {latest_file} stdout -l eng"
+            command = f"{BIN_PATH}/tesseract {latest_file} stdout -l chi_sim"
             result = subprocess.run(command, shell=True, capture_output=True, text=True, check=True)
             decky.logger.info(f"OCRLatest: Result: {result.stdout}")
             await self.tts(result.stdout)
