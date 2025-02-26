@@ -16,17 +16,19 @@ class Plugin:
     async def tts(self, text: str):
         try:
             decky.logger.info("Running TTS")
-            command = f'echo "{text}" | {BIN_PATH}/piper/piper --model {BIN_PATH}/en_GB-alba-medium.onnx --debug --output_file {WAV_PATH}'
-            process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-            stdout, stderr = process.communicate()
+            process = subprocess.Popen(
+                [f'{BIN_PATH}/piper/piper', '--model', f'{BIN_PATH}/en_GB-alba-medium.onnx', '--debug', '--output_file', f'{WAV_PATH}'],
+                stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
+            )
+            stdout, stderr = process.communicate(input=text)
             if process.returncode != 0:
-                raise subprocess.CalledProcessError(process.returncode, command, output=stdout, stderr=stderr)
+                raise subprocess.CalledProcessError(process.returncode, process.args, output=stdout, stderr=stderr)
             decky.logger.info("TTS completed")
         except subprocess.CalledProcessError as e:
-            decky.logger.error(f"Command failed with error: {e}")
-            decky.logger.error(f"Return code: {e.returncode}")
-            decky.logger.error(f"Output: {e.output}")
-            decky.logger.error(f"Stderr: {e.stderr}")
+            decky.logger.error(f"TTS: Command failed with error: {e}")
+            decky.logger.error(f"TTS: Return code: {e.returncode}")
+            decky.logger.error(f"TTS: Output: {e.output}")
+            decky.logger.error(f"TTS: Stderr: {e.stderr}")
 
         # Run the command
         try:
@@ -134,18 +136,8 @@ class Plugin:
     async def _main(self):
         self.loop = asyncio.get_event_loop()
 
-        # Check if /bin/piper exists
-        if not os.path.exists(f"{BIN_PATH}/piper"):
-            # Extract /bin/file to /bin
-            command = f"tar -xvf {BIN_PATH}/piper_linux_x86_64.tar.gz -C {BIN_PATH}"
-            result = subprocess.run(command, shell=True, capture_output=True, text=True, check=True)
-            decky.logger.info(f"Extraction result: {result.stdout}")
-        else:
-            decky.logger.info("/bin/piper already exists, skipping extraction")
-
         # OCR: Set the TESSDATA_PREFIX environment variable
         os.environ['TESSDATA_PREFIX'] = BIN_PATH
-
         # Player: Set the XDG_RUNTIME_DIR environment variable
         os.environ['XDG_RUNTIME_DIR'] = "/run/user/1000"
 
