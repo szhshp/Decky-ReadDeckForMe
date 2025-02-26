@@ -1,7 +1,6 @@
 #!/bin/sh
 
 # RUN THIS IN DECK, NOT DEV DEVICE
-
 echo "LOG: Checking if decky-rifm exists..."
 if test -e $HOME/homebrew/plugins/decky-rifm; then
     echo "LOG: decky-rifm exists, removing it..."
@@ -50,9 +49,5 @@ echo "LOG: Removed /tmp/decky-rifm.zip."
 echo "LOG: Starting plugin_loader service..."
 sudo systemctl start plugin_loader
 echo "LOG: Started plugin_loader service."
-
-echo "LOG: Setting permissions for decky-rifm..."
-sudo chmod -R 777 $HOME/homebrew/plugins/decky-rifm
-echo "LOG: Permissions set."
 
 echo "LOG: DECKY-RIFM IS INSTALLED."
