@@ -9,23 +9,24 @@ set -e
 
 # Clean up previous build
 rm -rf out
-rm -rf tmp
 
 # Run the build process
 pnpm run build
 
 # Create necessary directories
-mkdir -p $output_dir/{dist,bin}
+mkdir -p $output_dir/dist
+mkdir -p $output_dir/bin
 
 # Copy built files
 cp -r dist/* $output_dir/dist
 cp -r bin/* $output_dir/bin
 
 # Copy essential files
+cp package.json $output_dir/
 cp plugin.json $output_dir/
-cp main.py $output_dir/ 2>/dev/null || :
-cp README.md $output_dir/ 2>/dev/null || :
-cp LICENSE $output_dir/ 2>/dev/null || cp LICENSE.md $output_dir/ 2>/dev/null || :
+cp main.py $output_dir/
+cp README.md $output_dir/
+cp LICENSE $output_dir/ 
 
 # Create a temporary directory with the project name
 mkdir -p $temp_dir

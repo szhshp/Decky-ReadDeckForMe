@@ -19,6 +19,14 @@
       "problemMatcher": []
     },
     {
+      "label": "debugfrontend",
+      "detail": "",
+      "type": "shell",
+      "group": "build",
+      "command": "pnpm run build && scp ${workspaceFolder}/dist/* ${config:deckuser}@${config:deckip}:/home/deck/homebrew/plugins/decky-rifm/dist",
+      "problemMatcher": []
+    },
+    {
       "label": "showlog",
       "detail": "Show the latest log from the deck",
       "type": "shell",

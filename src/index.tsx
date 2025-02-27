@@ -14,7 +14,7 @@ import {
   // routerHook
 } from "@decky/api";
 import { useState } from "react";
-import { FaShip } from "react-icons/fa";
+import { FaFolder, FaShip, FaTrashAlt, FaVolumeUp } from "react-icons/fa";
 
 const ocr_latest = callable<[], { status: string; output: string }>(
   "ocr_latest"
@@ -57,12 +57,14 @@ function Content() {
     <PanelSection title="Panel Section">
       <PanelSectionRow>
         <ButtonItem layout="below" onClick={get_latest_img} disabled={loading}>
+          <FaFolder style={{ paddingRight: "4px" }} />
           {loading ? "Loading..." : "Get Latest File"}
         </ButtonItem>
       </PanelSectionRow>
       <PanelSectionRow>
         <ButtonItem layout="below" onClick={ocr} disabled={loading}>
-          {loading ? "Loading..." : "OCR Latest"}
+          <FaVolumeUp style={{ paddingRight: "4px" }} />
+          {loading ? "Loading..." : "Read It For Me"}
         </ButtonItem>
       </PanelSectionRow>
       <PanelSectionRow>
@@ -71,6 +73,7 @@ function Content() {
           onClick={delete_latest_img}
           disabled={loading}
         >
+          <FaTrashAlt style={{ paddingRight: "4px" }} />
           {loading ? "Loading..." : "Delete Latest File"}
         </ButtonItem>
       </PanelSectionRow>
