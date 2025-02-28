@@ -13,6 +13,7 @@ BIN_PATH = os.path.join(decky.DECKY_PLUGIN_DIR, "bin")
 WAV_PATH = os.path.join(decky.DECKY_PLUGIN_DIR, "dist/cache.wav")
 
 class Plugin:
+    steamdir = "/home/deck/.local/share/Steam/"
     async def tts(self, text: str):
         try:
             decky.logger.info("Running TTS")
@@ -42,10 +43,10 @@ class Plugin:
             decky.logger.error(f"Output: {e.output}")
             decky.logger.error(f"Stderr: {e.stderr}")
 
-    async def delete_latest(self) -> dict:
+    async def delete_latest(self, path:str) -> dict:
         decky.logger.info("Delete Latest - Start")
         try:
-            files = await self.get_file_list()
+            files = await self.get_file_list( path)
             decky.logger.info(f"DeleteLatest: Files: {files}")
             # Get the latest file
             latest_file = files["output"].split("\n")[0]
@@ -63,10 +64,10 @@ class Plugin:
             decky.logger.error(f"DeleteLatest: Stderr: {e.stderr}")
             return {"status": "error", "output": str(e)}
 
-    async def get_latest(self) -> dict:
+    async def get_latest(self, path: str) -> dict:
         decky.logger.info("Get Latest - Start")
         try:
-            files = await self.get_file_list()
+            files = await self.get_file_list( path)
             decky.logger.info(f"GetLatest: Files: {files}")
             # Get the latest file
             latest_file = files["output"].split("\n")[0]
@@ -84,10 +85,10 @@ class Plugin:
             decky.logger.error(f"GetLatest: Stderr: {e.stderr}")
             return {"status": "error", "output": str(e)}
 
-    async def ocr_latest(self) -> dict:
+    async def ocr_latest(self, path: str) -> dict:
         decky.logger.info("OCR Latest - Start")
         try:
-            latest_file_info = await self.get_latest()
+            latest_file_info = await self.get_latest(path)
             if latest_file_info["status"] != "success":
                 return latest_file_info
 
@@ -109,10 +110,11 @@ class Plugin:
             return {"status": "error", "output": str(e)}
 
 
-    async def get_file_list(self) -> dict:
+    async def get_file_list(self, path: str) -> dict:
         try:
             decky.logger.info("Running 'find' command")
-            command = "find /home/deck/Desktop/_Screenshot -type f -name '*.png' | sort | tail -n 1"
+            command = f"find {path} -type f -regex '.*\\.\(jpg\\|jpeg\\|png\\)$' | sort | tail -n 1"
+            decky.logger.info(f"Command: {command}")
             # Execute the command using subprocess.run
             result = subprocess.run(command, shell=True, capture_output=True, text=True, check=True)
             # Get the output and split by lines

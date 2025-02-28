@@ -1,6 +1,7 @@
 /* eslint-disable react/react-in-jsx-scope */
 import {
   ButtonItem,
+  Navigation,
   PanelSection,
   PanelSectionRow,
   staticClasses,
@@ -11,29 +12,43 @@ import {
   callable,
   definePlugin,
   toaster,
-  // routerHook
+  openFilePicker,
+  FileSelectionType,
 } from "@decky/api";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FaFolder, FaShip, FaTrashAlt, FaVolumeUp } from "react-icons/fa";
 
-const ocr_latest = callable<[], { status: string; output: string }>(
+const ocr_latest = callable<[path: string], { status: string; output: string }>(
   "ocr_latest"
 );
+
 const get_latest = callable<
-  [],
+  [path: string],
   { status: string; output: string; base64: string }
 >("get_latest");
-const delete_latest = callable<[], { status: string; output: string }>(
-  "delete_latest"
-);
 
-function Content() {
+const delete_latest = callable<
+  [path: string],
+  { status: string; output: string }
+>("delete_latest");
+
+const Content = () => {
   const [content, setContent] = useState<string | undefined>();
   const [loading, setLoading] = useState<boolean>(false);
+  const [screenshotPath, setScreenshotPath] = useState<string>("");
+
+  useEffect(() => {
+    const onInit = async () => {
+      const lastUsedPath = localStorage.getItem("screenshotPath");
+      const path = lastUsedPath || "/home/deck/.local/share/Steam/userdata";
+      setScreenshotPath(path);
+    };
+    onInit();
+  }, []);
 
   const get_latest_img = async () => {
     setLoading(true);
-    const result = await get_latest();
+    const result = await get_latest(screenshotPath);
     setContent(result.base64);
     setLoading(false);
   };
@@ -41,20 +56,53 @@ function Content() {
   const ocr = async () => {
     console.log("ocr");
     setLoading(true);
-    await ocr_latest();
+    await ocr_latest(screenshotPath);
     setLoading(false);
   };
 
   const delete_latest_img = async () => {
     setLoading(true);
-    const result = await delete_latest();
+    const result = await delete_latest(screenshotPath);
     console.log(result);
     setContent(undefined);
     setLoading(false);
   };
 
+  const openFilePickerHandler = async () => {
+    Navigation.CloseSideMenus();
+
+    const res = await openFilePicker(
+      FileSelectionType.FOLDER,
+      "/home/deck/.local/share/Steam/userdata",
+      true,
+      undefined,
+      undefined,
+      undefined,
+      false,
+      true
+    );
+
+    if (res) {
+      localStorage.setItem("screenshotPath", res.path);
+      setScreenshotPath(res.path);
+    }
+  };
+
   return (
     <PanelSection title="Panel Section">
+      <PanelSectionRow>
+        <ButtonItem
+          layout="below"
+          onClick={openFilePickerHandler}
+          disabled={loading}
+        >
+          <FaFolder style={{ paddingRight: "4px" }} />
+          Select Screenshot Folder
+        </ButtonItem>
+      </PanelSectionRow>
+      <PanelSectionRow>
+        <div style={{ fontSize: "smaller" }}>Path: {screenshotPath}</div>
+      </PanelSectionRow>
       <PanelSectionRow>
         <ButtonItem layout="below" onClick={get_latest_img} disabled={loading}>
           <FaFolder style={{ paddingRight: "4px" }} />
@@ -109,7 +157,7 @@ function Content() {
       </PanelSectionRow>*/}
     </PanelSection>
   );
-}
+};
 
 export default definePlugin(() => {
   console.log(
