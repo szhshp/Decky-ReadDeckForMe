@@ -9,14 +9,16 @@ if test -e $HOME/homebrew/plugins/decky-rifm; then
 fi
 
 # Comment this deletion if on debug mode
-# echo "LOG: Checking if /tmp/decky-rifm.zip exists..."
-# if test -e /tmp/decky-rifm.zip; then
-#     echo "LOG: Removing /tmp/decky-rifm.zip..."
-#     sudo rm /tmp/decky-rifm.zip
-#     echo "LOG: Removed /tmp/decky-rifm.zip."
-# fi
+echo "LOG: Checking if /tmp/decky-rifm.zip exists..."
+if test -e /tmp/decky-rifm.zip; then
+    echo "LOG: Removing /tmp/decky-rifm.zip..."
+    sudo rm /tmp/decky-rifm.zip
+    echo "LOG: Removed /tmp/decky-rifm.zip."
+fi
 
 echo "LOG: Downloading decky-rifm..."
+curl -L https://gh-proxy.com/github.com/szhshp/read-deck-for-me/releases/download/latest/decky-rifm.zip > /tmp/decky-rifm.zip
+echo "LOG: Downloaded decky-rifm."
 
 echo "LOG: Checking if plugins directory exists..."
 if test ! -e $HOME/homebrew/plugins; then
