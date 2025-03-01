@@ -1,20 +1,22 @@
 
 # Decky Plugin - ReadItForMe 
 
-This is a personal use decky plugin to read the text of your latest screenshot.
+A personal Decky plugin to read the text from your latest screenshot.
 
 ## Screenshots
 
 (TODO)
 
-## Development ENV Setup
+## Development Environment Setup
 
-1. Set up SSH to login without a password (using RSA).
-2. Run `pnpm i` to install dependencies.
-3. Run `/script/setup.sh` to build, zip, and ship the plugin to Decky.
-4. Install the plugin in Decky-Loader in Dev mode.
-5. Once you see `decky-rifm` in `/homebrew/plugins` in Decky-Loader, you can start developing the plugin.
-6. Change the permissions of that folder: `sudo chmod -R 777 /decky-rifm` to allow overwriting files in that folder.
-7. Make changes in the code, both frontend and backend.
-8. Run `/script/build.sh` again to see the changes in Decky-Loader (you may need to reload or click the reinstall button in Decky-Loader).
+1. Set up SSH for passwordless login (using RSA).
+2. Run `pnpm install` to install dependencies.
+3. Make your code changes.
+4. Run `task:build` to build the project and `task:copyzip` to transfer the zip file to your Deck.
+5. Run `script/deploy.sh` on your Deck to install the plugin.
 
+## TODO
+
+- [x] Add a folder selector to choose where screenshots are saved
+- [ ] Support Chinese language
+- [ ] Publish to the Decky Store
