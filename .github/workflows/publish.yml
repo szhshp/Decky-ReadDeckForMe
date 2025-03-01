@@ -55,7 +55,7 @@ jobs:
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         overwrite: true
-        release_name: Release-${{ github.event.head_commit.timestamp | date('YYYY-MM-DD') }}
+        release_name: Release
         file: ./out/decky-rifm.zip
         asset_name: decky-rifm.zip
-        tag: ${{ github.event.head_commit.timestamp | date('YYYY-MM-DD') }}
+        tag: latest
