@@ -1,6 +1,8 @@
 
 # Decky Plugin - ReadItForMe 
 
+> Under Development, but feel free to try it out!
+
 A personal Decky plugin to read the text from your latest screenshot.
 
 ## Screenshots
@@ -17,6 +19,12 @@ A personal Decky plugin to read the text from your latest screenshot.
 
 ## TODO
 
+### Bugs
+
+- [ ] Chmod is not working!
+
+### Features
+
 - [x] Add a folder selector to choose where screenshots are saved
 - [ ] Support Chinese language
-- [ ] Publish to the Decky Store
+- [ ] Publish to the Decky Store?
