@@ -6,9 +6,10 @@
 A personal Decky plugin to read the text from your latest screenshot.
 
 ## Screenshots
-
 [Demo(Youtube)](https://www.youtube.com/watch?v=fjsc5IqgmzU?si=0S-l1QOr71csefn8)
 
+
+[![YouTube](http://i.ytimg.com/vi/fjsc5IqgmzU/hqdefault.jpg)](https://www.youtube.com/watch?v=fjsc5IqgmzU)
 ## Dev Guide
 
 1. Set up SSH for passwordless login (using RSA).
