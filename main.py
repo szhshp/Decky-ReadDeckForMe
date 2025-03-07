@@ -10,7 +10,7 @@ import subprocess
 
 PLUGIN_PATH = decky.DECKY_PLUGIN_DIR
 BIN_PATH = os.path.join(decky.DECKY_PLUGIN_DIR, "bin")
-WAV_PATH = os.path.join(decky.DECKY_PLUGIN_DIR, "dist/cache.wav")
+WAV_PATH = '/tmp/rifm/cache.wav'
 
 class Plugin:
     steamdir = "/home/deck/.local/share/Steam/"
@@ -113,7 +113,7 @@ class Plugin:
     async def get_file_list(self, path: str) -> dict:
         try:
             decky.logger.info("Running 'find' command")
-            command = f"find {path} -type f -regex '.*\\.\(jpg\\|jpeg\\|png\\)$' -printf '%T@ %p\n' | sort -nr | head -n 1 | cut -d' ' -f2- "
+            command = f"find {path} -type f -regex '.*\\.\(jpg\\|jpeg\\|png\\)$' ! -path '*/thumbnails/*' -printf '%T@ %p\n' | sort -nr | head -n 1 | cut -d' ' -f2- "
             decky.logger.info(f"Command: {command}")
             # Execute the command using subprocess.run
             result = subprocess.run(command, shell=True, capture_output=True, text=True, check=True)

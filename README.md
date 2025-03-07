@@ -7,9 +7,9 @@ A personal Decky plugin to read the text from your latest screenshot.
 
 ## Screenshots
 
-(TODO)
+[Demo(Youtube)](https://www.youtube.com/watch?v=fjsc5IqgmzU?si=0S-l1QOr71csefn8)
 
-## Development Environment Setup
+## Dev Guide
 
 1. Set up SSH for passwordless login (using RSA).
 2. Run `pnpm install` to install dependencies.
