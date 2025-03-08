@@ -34,6 +34,11 @@ const download_lang_model = callable<
   { status: string; output: string }
 >("download_lang_model");
 
+const check_lang_model = callable<
+  [lang: string],
+  { status: string; output: { [key: string]: boolean } }
+>("check_lang_model");
+
 const delete_latest = callable<
   [path: string],
   { status: string; output: string }
@@ -45,6 +50,10 @@ const Content = () => {
   const [lang, setLang] = useState<string>("eng");
   const [loadedLangs, setLoadedLangs] = useState<string[]>([]);
   const [screenshotPath, setScreenshotPath] = useState<string>("");
+  const [integrationStatus, setIntegrationStatus] = useState<{
+    [key: string]: boolean;
+  }>({});
+  console.log("integrationStatus: ", integrationStatus);
 
   useEffect(() => {
     const onInit = async () => {
@@ -109,10 +118,19 @@ const Content = () => {
     setLoading(false);
   };
 
+  const check_model_integration = async () => {
+    setLoading(true);
+    const result = await check_lang_model(lang);
+    setIntegrationStatus(result.output);
+    setLoading(false);
+  };
+
   const candidateLangs = [
     { data: "eng", label: "English" },
     { data: "chi_sim", label: "Chinese" },
   ];
+
+  const selectedLang = candidateLangs.find((x) => x.data === lang)?.label;
 
   return (
     <>
@@ -126,13 +144,9 @@ const Content = () => {
             <FaFolder style={{ paddingRight: "4px" }} />
             Select Screenshot Folder
           </ButtonItem>
-          <div
-            style={{
-              fontSize: "10px",
-              overflowWrap: "anywhere",
-            }}
-          >
-            Path (thumbnails will be excluded): {screenshotPath}
+          <div style={{ fontSize: "10px", overflowWrap: "anywhere" }}>
+            <div>Path: {screenshotPath}</div>
+            <div>(thumbnails will be excluded)</div>
           </div>
         </PanelSectionRow>
 
@@ -150,8 +164,25 @@ const Content = () => {
         <PanelSectionRow>
           <ButtonItem layout="below" onClick={download_lang} disabled={loading}>
             <FaFolder style={{ paddingRight: "4px" }} />
-            Download Language Data (Approx. 100M)
+            Download Language Data - {selectedLang} (Approx. 80M)
           </ButtonItem>
+        </PanelSectionRow>
+        <PanelSectionRow>
+          <ButtonItem
+            layout="below"
+            onClick={check_model_integration}
+            disabled={loading}
+          >
+            <FaFolder style={{ paddingRight: "4px" }} />
+            Check {selectedLang} Data Integration
+          </ButtonItem>
+          {Object.keys(integrationStatus).length > 0 && (
+            <div>
+              {selectedLang} -
+              {Object.values(integrationStatus).filter(Boolean).length} of{" "}
+              {Object.keys(integrationStatus).length} Downloaded
+            </div>
+          )}
         </PanelSectionRow>
       </PanelSection>
       <PanelSection title="Actions">
@@ -193,12 +224,6 @@ const Content = () => {
             </div>
           </PanelSectionRow>
         )}
-
-        {/* <PanelSectionRow>
-        <div style={{ display: "flex", justifyContent: "center" }}>
-          <img src={logo} />
-        </div>
-      </PanelSectionRow> */}
 
         {/*<PanelSectionRow>
         <ButtonItem

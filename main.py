@@ -9,7 +9,7 @@ import asyncio
 import subprocess
 import aiohttp
 import certifi
-
+import hashlib
 
 PLUGIN_PATH = decky.DECKY_PLUGIN_DIR
 BIN_PATH = os.path.join(decky.DECKY_PLUGIN_DIR, "bin")
@@ -18,14 +18,38 @@ WAV_PATH = '/tmp/rifm/cache.wav'
 
 model_map = {
     "chi_sim": {
-        "tesseract": {"url": "https://github.com/tesseract-ocr/tessdata/raw/refs/heads/main/chi_sim.traineddata", "filename": "chi_sim.traineddata"},
-        "onnx": {"url": "https://huggingface.co/rhasspy/piper-voices/resolve/v1.0.0/zh/zh_CN/huayan/medium/zh_CN-huayan-medium.onnx?download=true", "filename": "zh_CN-huayan-medium.onnx"},
-        "onnx_json": {"url": "https://huggingface.co/rhasspy/piper-voices/resolve/v1.0.0/zh/zh_CN/huayan/medium/zh_CN-huayan-medium.onnx.json?download=true.json", "filename": "zh_CN-huayan-medium.onnx.json"}
+        "tesseract": {
+            "url": "https://github.com/tesseract-ocr/tessdata_fast/raw/refs/heads/main/chi_sim.traineddata",
+            "filename": "chi_sim.traineddata",
+            "sha256hash":"a5fcb6f0db1e1d6d8522f39db4e848f05984669172e584e8d76b6b3141e1f730"
+        },
+        "onnx": {
+            "url": "https://huggingface.co/rhasspy/piper-voices/resolve/v1.0.0/zh/zh_CN/huayan/medium/zh_CN-huayan-medium.onnx?download=true",
+            "filename": "zh_CN-huayan-medium.onnx",
+            "sha256hash": "9929917bf8cabb26fd528ea44d3a6699c11e87317a14765312420be230be0f3d"
+        },
+        "onnx_json": {
+            "url": "https://huggingface.co/rhasspy/piper-voices/resolve/v1.0.0/zh/zh_CN/huayan/medium/zh_CN-huayan-medium.onnx.json?download=true.json",
+            "filename": "zh_CN-huayan-medium.onnx.json",
+            "sha256hash": "d521dc45504a8ccc99e325822b35946dd701840bfb07e3dbb31a40929ed6a82b"
+        }
     },
     "eng": {
-        "tesseract": {"url": "https://github.com/tesseract-ocr/tessdata/raw/refs/heads/main/eng.traineddata", "filename": "eng.traineddata"},
-        "onnx": {"url": "https://huggingface.co/rhasspy/piper-voices/resolve/v1.0.0/en/en_US/amy/medium/en_US-amy-medium.onnx?download=true", "filename": "en_US-amy-medium.onnx"},
-        "onnx_json": {"url": "https://huggingface.co/rhasspy/piper-voices/resolve/v1.0.0/en/en_US/amy/medium/en_US-amy-medium.onnx.json?download=true.json", "filename": "en_US-amy-medium.onnx.json"}
+        "tesseract": {
+            "url": "https://github.com/tesseract-ocr/tessdata_fast/raw/refs/heads/main/eng.traineddata",
+            "filename": "eng.traineddata",
+            "sha256hash": "7d4322bd2a7749724879683fc3912cb542f19906c83bcc1a52132556427170b2"
+        },
+        "onnx": {
+            "url": "https://huggingface.co/rhasspy/piper-voices/resolve/v1.0.0/en/en_US/amy/medium/en_US-amy-medium.onnx?download=true",
+            "filename": "en_US-amy-medium.onnx",
+            "sha256hash": "b3a6e47b57b8c7fbe6a0ce2518161a50f59a9cdd8a50835c02cb02bdd6206c18"
+        },
+        "onnx_json": {
+            "url": "https://huggingface.co/rhasspy/piper-voices/resolve/v1.0.0/en/en_US/amy/medium/en_US-amy-medium.onnx.json?download=true.json",
+            "filename": "en_US-amy-medium.onnx.json",
+            "sha256hash": "95a23eb4d42909d38df73bb9ac7f45f597dbfcde2d1bf9526fdeaf5466977d77"
+        }
     }
 }
 
@@ -147,7 +171,50 @@ class Plugin:
         except subprocess.CalledProcessError as e:
             decky.logger.error(f"Command failed with error: {e}")
             return {"status": "error", "output": str(e)}
-    
+
+    def file_matches_hash(self, file_path, expected_hash):
+        decky.logger.info(f"Checking file hash for {file_path}")
+        if not os.path.exists(file_path):
+            return False
+        sha256 = hashlib.sha256()
+        with open(file_path, "rb") as f:
+            for chunk in iter(lambda: f.read(4096), b""):
+                sha256.update(chunk)
+        file_hash = sha256.hexdigest()
+        decky.logger.info(f"File hash: {file_hash}")
+        decky.logger.info(f"Expected hash: {expected_hash}")
+        return file_hash == expected_hash
+
+    async def check_lang_model(self, lang: str) -> dict:
+        try:
+            decky.logger.info(f"Checking language models for {lang}")
+            lang_dir = os.path.join('/tmp/rifm', lang)
+            os.makedirs(lang_dir, exist_ok=True)
+            model_files = model_map[lang]
+            files_to_download = [
+                model_files["tesseract"],
+                model_files["onnx"], 
+                model_files["onnx_json"]
+            ]
+            lang_status = {}
+            for model in files_to_download:
+                model_file = model["filename"]
+                output_path = os.path.join(lang_dir, model_file)
+                decky.logger.info(f"Checking {model_file} at {output_path}")
+                if os.path.exists(output_path) and self.file_matches_hash(output_path, model["sha256hash"]):
+                    decky.logger.info(f"File {model_file} exists and matches the hash")
+                    lang_status[model_file] = True
+                else:
+                    decky.logger.info(f"File {model_file} is missing or does not match the hash")
+                    lang_status[model_file] = False
+                decky.logger.info(f"Model: {model_file} - Status: {lang_status[model_file]}")
+            
+            decky.logger.info(f"Language: {lang} - Status: {lang_status}")
+            return {"status": "success", "output": lang_status}
+        except Exception as e:
+            decky.logger.error(f"Error: {e}")
+            return {"status": "error", "output": str(e)}
+
     async def download_lang_model(self, lang: str) -> dict:
         try:
             model_files = model_map[lang]
@@ -160,10 +227,17 @@ class Plugin:
             lang_dir = os.path.join('/tmp/rifm', lang)
             os.makedirs(lang_dir, exist_ok=True)
 
+
             for model in files_to_download:
                 model_url = model["url"]
                 model_file = model["filename"]
+                expected_hash = model["sha256hash"]
                 output_path = os.path.join(lang_dir, model_file)
+
+                if self.file_matches_hash(output_path, expected_hash):
+                    decky.logger.info(f"File {model_file} already exists and matches the hash. Skipping download.")
+                    continue
+
                 decky.logger.info(f"Downloading {model_file} from {model_url} to {output_path}")
 
                 last_progress = 0
@@ -205,6 +279,15 @@ class Plugin:
 
     async def _main(self):
         self.loop = asyncio.get_event_loop()
+
+        # Check if /bin/piper exists
+        if not os.path.exists(f"{BIN_PATH}/piper"):
+            # Extract /bin/file to /bin
+            command = f"tar -xvf {BIN_PATH}/piper_linux_x86_64.tar.gz -C {BIN_PATH}"
+            result = subprocess.run(command, shell=True, capture_output=True, text=True, check=True)
+            decky.logger.info(f"Extraction result: {result.stdout}")
+        else:
+            decky.logger.info("/bin/piper already exists, skipping extraction")
 
         # Player: Set the XDG_RUNTIME_DIR environment variable
         os.environ['XDG_RUNTIME_DIR'] = "/run/user/1000"
