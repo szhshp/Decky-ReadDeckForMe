@@ -1,6 +1,7 @@
 /* eslint-disable react/react-in-jsx-scope */
 import {
   ButtonItem,
+  DropdownItem,
   Navigation,
   PanelSection,
   PanelSectionRow,
@@ -18,14 +19,20 @@ import {
 import { useEffect, useState } from "react";
 import { FaFolder, FaShip, FaTrashAlt, FaVolumeUp } from "react-icons/fa";
 
-const ocr_latest = callable<[path: string], { status: string; output: string }>(
-  "ocr_latest"
-);
+const ocr_latest = callable<
+  [path: string, lang: string],
+  { status: string; output: string }
+>("ocr_latest");
 
 const get_latest = callable<
   [path: string],
   { status: string; output: string; base64: string }
 >("get_latest");
+
+const download_lang_model = callable<
+  [lang: string],
+  { status: string; output: string }
+>("download_lang_model");
 
 const delete_latest = callable<
   [path: string],
@@ -35,13 +42,18 @@ const delete_latest = callable<
 const Content = () => {
   const [content, setContent] = useState<string | undefined>();
   const [loading, setLoading] = useState<boolean>(false);
+  const [lang, setLang] = useState<string>("eng");
+  const [loadedLangs, setLoadedLangs] = useState<string[]>([]);
   const [screenshotPath, setScreenshotPath] = useState<string>("");
 
   useEffect(() => {
     const onInit = async () => {
-      const lastUsedPath = localStorage.getItem("screenshotPath");
-      const path = lastUsedPath || "/home/deck/.local/share/Steam/userdata";
-      setScreenshotPath(path);
+      setScreenshotPath(
+        localStorage.getItem("screenshotPath") ||
+          "/home/deck/.local/share/Steam/userdata"
+      );
+      setLang(localStorage.getItem("lang") || "eng");
+      setLoadedLangs(localStorage.getItem("loadedLangs")?.split(",") || []);
     };
     onInit();
   }, []);
@@ -56,7 +68,7 @@ const Content = () => {
   const ocr = async () => {
     console.log("ocr");
     setLoading(true);
-    await ocr_latest(screenshotPath);
+    await ocr_latest(screenshotPath, lang);
     setLoading(false);
   };
 
@@ -88,63 +100,107 @@ const Content = () => {
     }
   };
 
-  return (
-    <PanelSection title="Panel Section">
-      <PanelSectionRow>
-        <ButtonItem
-          layout="below"
-          onClick={openFilePickerHandler}
-          disabled={loading}
-        >
-          <FaFolder style={{ paddingRight: "4px" }} />
-          Select Screenshot Folder
-        </ButtonItem>
-      </PanelSectionRow>
-      <PanelSectionRow>
-        <div style={{ fontSize: "smaller" }}>Path: {screenshotPath}</div>
-      </PanelSectionRow>
-      <PanelSectionRow>
-        <ButtonItem layout="below" onClick={get_latest_img} disabled={loading}>
-          <FaFolder style={{ paddingRight: "4px" }} />
-          {loading ? "Loading..." : "Get Latest File"}
-        </ButtonItem>
-      </PanelSectionRow>
-      <PanelSectionRow>
-        <ButtonItem layout="below" onClick={ocr} disabled={loading}>
-          <FaVolumeUp style={{ paddingRight: "4px" }} />
-          {loading ? "Loading..." : "Read It For Me"}
-        </ButtonItem>
-      </PanelSectionRow>
-      <PanelSectionRow>
-        <ButtonItem
-          layout="below"
-          onClick={delete_latest_img}
-          disabled={loading}
-        >
-          <FaTrashAlt style={{ paddingRight: "4px" }} />
-          {loading ? "Loading..." : "Delete Latest File"}
-        </ButtonItem>
-      </PanelSectionRow>
+  const download_lang = async () => {
+    setLoading(true);
+    const result = await download_lang_model(lang);
+    console.log(result);
+    setLoadedLangs([...loadedLangs, lang]);
+    localStorage.setItem("loadedLangs", loadedLangs.join(","));
+    setLoading(false);
+  };
 
-      {content && (
+  const candidateLangs = [
+    { data: "eng", label: "English" },
+    { data: "chi_sim", label: "Chinese" },
+  ];
+
+  return (
+    <>
+      <PanelSection title="Setup">
         <PanelSectionRow>
-          <div style={{ display: "flex", justifyContent: "center" }}>
-            <img
-              src={`data:image/png;base64,${content}`}
-              alt="OCR Result"
-              style={{ width: "80vw", border: "1px solid grey" }}
-            />
+          <ButtonItem
+            layout="below"
+            onClick={openFilePickerHandler}
+            disabled={loading}
+          >
+            <FaFolder style={{ paddingRight: "4px" }} />
+            Select Screenshot Folder
+          </ButtonItem>
+          <div
+            style={{
+              fontSize: "10px",
+              overflowWrap: "anywhere",
+            }}
+          >
+            Path (thumbnails will be excluded): {screenshotPath}
           </div>
         </PanelSectionRow>
-      )}
 
-      {/* <PanelSectionRow>
+        <PanelSectionRow>
+          <DropdownItem
+            strDefaultLabel={"Select Language"}
+            rgOptions={candidateLangs}
+            selectedOption={lang}
+            onChange={(val) => {
+              setLang(val.data);
+              localStorage.setItem("lang", val.data);
+            }}
+          />
+        </PanelSectionRow>
+        <PanelSectionRow>
+          <ButtonItem layout="below" onClick={download_lang} disabled={loading}>
+            <FaFolder style={{ paddingRight: "4px" }} />
+            Download Language Data (Approx. 100M)
+          </ButtonItem>
+        </PanelSectionRow>
+      </PanelSection>
+      <PanelSection title="Actions">
+        <PanelSectionRow>
+          <ButtonItem
+            layout="below"
+            onClick={get_latest_img}
+            disabled={loading}
+          >
+            <FaFolder style={{ paddingRight: "4px" }} />
+            {loading ? "Loading..." : "Get Latest File"}
+          </ButtonItem>
+        </PanelSectionRow>
+        <PanelSectionRow>
+          <ButtonItem layout="below" onClick={ocr} disabled={loading}>
+            <FaVolumeUp style={{ paddingRight: "4px" }} />
+            {loading ? "Loading..." : "Read It For Me"}
+          </ButtonItem>
+        </PanelSectionRow>
+        <PanelSectionRow>
+          <ButtonItem
+            layout="below"
+            onClick={delete_latest_img}
+            disabled={loading}
+          >
+            <FaTrashAlt style={{ paddingRight: "4px" }} />
+            {loading ? "Loading..." : "Delete Latest File"}
+          </ButtonItem>
+        </PanelSectionRow>
+
+        {content && (
+          <PanelSectionRow>
+            <div style={{ display: "flex", justifyContent: "center" }}>
+              <img
+                src={`data:image/png;base64,${content}`}
+                alt="OCR Result"
+                style={{ width: "80vw", border: "1px solid grey" }}
+              />
+            </div>
+          </PanelSectionRow>
+        )}
+
+        {/* <PanelSectionRow>
         <div style={{ display: "flex", justifyContent: "center" }}>
           <img src={logo} />
         </div>
       </PanelSectionRow> */}
 
-      {/*<PanelSectionRow>
+        {/*<PanelSectionRow>
         <ButtonItem
           layout="below"
           onClick={() => {
@@ -155,7 +211,8 @@ const Content = () => {
           Router
         </ButtonItem>
       </PanelSectionRow>*/}
-    </PanelSection>
+      </PanelSection>
+    </>
   );
 };
 
@@ -168,14 +225,12 @@ export default definePlugin(() => {
   //   exact: true,
   // });
 
-  // Add an event listener to the "timer_event" event from the backend
-  const listener = addEventListener<
-    [test1: string, test2: boolean, test3: number]
-  >("timer_event", (test1, test2, test3) => {
-    console.log("Template got timer_event with:", test1, test2, test3);
+  // Add an event listener to the "toast_event" event from the backend
+  const listener = addEventListener<[test1: string]>("toast_event", (test1) => {
+    console.log("Template got toast_event with:", test1);
     toaster.toast({
-      title: "template got timer_event",
-      body: `${test1}, ${test2}, ${test3}`,
+      title: "Notification From RIFM",
+      body: `${test1}`,
     });
   });
 
@@ -191,7 +246,7 @@ export default definePlugin(() => {
     // The function triggered when your plugin unloads
     onDismount() {
       console.log("Unloading");
-      removeEventListener("timer_event", listener);
+      removeEventListener("toast_event", listener);
       // serverApi.routerHook.removeRoute("/decky-plugin-test");
     },
   };

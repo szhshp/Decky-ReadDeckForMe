@@ -1,24 +1,44 @@
 import base64
 import os
-
+import ssl
 # The decky plugin module is located at decky-loader/plugin
 # For easy intellisense checkout the decky-loader code repo
 # and add the `decky-loader/plugin/imports` path to `python.analysis.extraPaths` in `.vscode/settings.json`
 import decky
 import asyncio
 import subprocess
+import aiohttp
+import certifi
+
 
 PLUGIN_PATH = decky.DECKY_PLUGIN_DIR
 BIN_PATH = os.path.join(decky.DECKY_PLUGIN_DIR, "bin")
+MODEL_PATH = '/tmp/rifm'
 WAV_PATH = '/tmp/rifm/cache.wav'
+
+model_map = {
+    "chi_sim": {
+        "tesseract": {"url": "https://github.com/tesseract-ocr/tessdata/raw/refs/heads/main/chi_sim.traineddata", "filename": "chi_sim.traineddata"},
+        "onnx": {"url": "https://huggingface.co/rhasspy/piper-voices/resolve/v1.0.0/zh/zh_CN/huayan/medium/zh_CN-huayan-medium.onnx?download=true", "filename": "zh_CN-huayan-medium.onnx"},
+        "onnx_json": {"url": "https://huggingface.co/rhasspy/piper-voices/resolve/v1.0.0/zh/zh_CN/huayan/medium/zh_CN-huayan-medium.onnx.json?download=true.json", "filename": "zh_CN-huayan-medium.onnx.json"}
+    },
+    "eng": {
+        "tesseract": {"url": "https://github.com/tesseract-ocr/tessdata/raw/refs/heads/main/eng.traineddata", "filename": "eng.traineddata"},
+        "onnx": {"url": "https://huggingface.co/rhasspy/piper-voices/resolve/v1.0.0/en/en_US/amy/medium/en_US-amy-medium.onnx?download=true", "filename": "en_US-amy-medium.onnx"},
+        "onnx_json": {"url": "https://huggingface.co/rhasspy/piper-voices/resolve/v1.0.0/en/en_US/amy/medium/en_US-amy-medium.onnx.json?download=true.json", "filename": "en_US-amy-medium.onnx.json"}
+    }
+}
 
 class Plugin:
     steamdir = "/home/deck/.local/share/Steam/"
-    async def tts(self, text: str):
+    ssl_context = ssl.create_default_context(cafile=certifi.where())
+    async def tts(self, text: str, lang: str = "eng") -> None:
         try:
             decky.logger.info("Running TTS")
+            onnx_model = model_map[lang]["onnx"]["filename"]
+            decky.logger.info(f"Using ONNX model: {onnx_model}")
             process = subprocess.Popen(
-                [f'{BIN_PATH}/piper/piper', '--model', f'{BIN_PATH}/en_GB-alba-medium.onnx', '--debug', '--output_file', f'{WAV_PATH}'],
+                [f'{BIN_PATH}/piper/piper', '--model', f'{MODEL_PATH}/{lang}/{onnx_model}', '--debug', '--output_file', f'{WAV_PATH}'],
                 stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
             )
             stdout, stderr = process.communicate(input=text)
@@ -85,8 +105,9 @@ class Plugin:
             decky.logger.error(f"GetLatest: Stderr: {e.stderr}")
             return {"status": "error", "output": str(e)}
 
-    async def ocr_latest(self, path: str) -> dict:
+    async def ocr_latest(self, path: str, lang: str = "eng") -> dict:
         decky.logger.info("OCR Latest - Start")
+        os.environ['TESSDATA_PREFIX'] = f"{MODEL_PATH}/{lang}"
         try:
             latest_file_info = await self.get_latest(path)
             if latest_file_info["status"] != "success":
@@ -96,10 +117,10 @@ class Plugin:
             decky.logger.info(f"OCRLatest: Latest_file: {latest_file}")
 
             decky.logger.info("OCRLatest: Running OCR")
-            command = f"{BIN_PATH}/tesseract {latest_file} stdout -l eng"
+            command = f"{BIN_PATH}/tesseract {latest_file} stdout -l {lang} "
             result = subprocess.run(command, shell=True, capture_output=True, text=True, check=True)
             decky.logger.info(f"OCRLatest: Result: {result.stdout}")
-            await self.tts(result.stdout)
+            await self.tts(result.stdout, lang)
 
             return {"status": "success", "output": result.stdout}
         except subprocess.CalledProcessError as e:
@@ -126,6 +147,53 @@ class Plugin:
         except subprocess.CalledProcessError as e:
             decky.logger.error(f"Command failed with error: {e}")
             return {"status": "error", "output": str(e)}
+    
+    async def download_lang_model(self, lang: str) -> dict:
+        try:
+            model_files = model_map[lang]
+            files_to_download = [
+                model_files["tesseract"],
+                model_files["onnx"], 
+                model_files["onnx_json"]
+            ]
+
+            lang_dir = os.path.join('/tmp/rifm', lang)
+            os.makedirs(lang_dir, exist_ok=True)
+
+            for model in files_to_download:
+                model_url = model["url"]
+                model_file = model["filename"]
+                output_path = os.path.join(lang_dir, model_file)
+                decky.logger.info(f"Downloading {model_file} from {model_url} to {output_path}")
+
+                last_progress = 0
+                async with aiohttp.ClientSession() as session:
+                    async with session.get(model_url, ssl=self.ssl_context) as res:
+                        res.raise_for_status()
+                        total_size = int(res.headers.get('Content-Length', 0))
+                        downloaded_size = 0
+                        with open(output_path, "wb") as file:
+                            async for chunk in res.content.iter_chunked(1024):
+                                file.write(chunk)
+                                downloaded_size += len(chunk)
+                                progress = (downloaded_size / total_size) * 100
+                                if progress - last_progress > 1:
+                                    last_progress = progress
+                                    decky.logger.info(f"Downloading {model_file}: {int(progress)}%")
+
+                decky.logger.info(f"Downloaded {model_file}")
+
+            return {"status": "success", "output": f"Downloaded language model for '{lang}'"}
+        except subprocess.CalledProcessError as e:
+            decky.logger.error(f"Command failed with error: {e}")
+            decky.logger.error(f"Return code: {e.returncode}")
+            decky.logger.error(f"Output: {e.output}")
+            decky.logger.error(f"Stderr: {e.stderr}")
+            return {"status": "error", "output": str(e)}
+        except ValueError as e:
+            decky.logger.error(f"Error: {e}")
+            return {"status": "error", "output": str(e)}
+
 
     async def backend_addition(self, parameter_a: int, parameter_b: int) -> str:
         return str(parameter_a + parameter_b)
@@ -133,13 +201,11 @@ class Plugin:
     async def long_running(self):
         await asyncio.sleep(15)
         # Passing through a bunch of random data, just as an example
-        await decky.emit("timer_event", "Hello from the backend!", True, 2)
+        await decky.emit("toast_event", "Hello from the backend!", True, 2)
 
     async def _main(self):
         self.loop = asyncio.get_event_loop()
 
-        # OCR: Set the TESSDATA_PREFIX environment variable
-        os.environ['TESSDATA_PREFIX'] = BIN_PATH
         # Player: Set the XDG_RUNTIME_DIR environment variable
         os.environ['XDG_RUNTIME_DIR'] = "/run/user/1000"
 
