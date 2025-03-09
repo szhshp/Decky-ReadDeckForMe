@@ -23,4 +23,5 @@ A personal Decky plugin to read the text from your latest screenshot.
 - [x] Add a button to download language models
 - [x] Add Chinese Support
 - [x] Check Model File Integrity
+- [ ] Add stop read button
 - [ ] Publish to the Decky Store

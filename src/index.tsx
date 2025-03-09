@@ -1,5 +1,14 @@
 /* eslint-disable react/react-in-jsx-scope */
 import {
+  addEventListener,
+  callable,
+  definePlugin,
+  FileSelectionType,
+  openFilePicker,
+  removeEventListener,
+  toaster,
+} from "@decky/api";
+import {
   ButtonItem,
   DropdownItem,
   Navigation,
@@ -7,15 +16,6 @@ import {
   PanelSectionRow,
   staticClasses,
 } from "@decky/ui";
-import {
-  addEventListener,
-  removeEventListener,
-  callable,
-  definePlugin,
-  toaster,
-  openFilePicker,
-  FileSelectionType,
-} from "@decky/api";
 import { useEffect, useState } from "react";
 import { FaFolder, FaShip, FaTrashAlt, FaVolumeUp } from "react-icons/fa";
 
@@ -53,7 +53,6 @@ const Content = () => {
   const [integrationStatus, setIntegrationStatus] = useState<{
     [key: string]: boolean;
   }>({});
-  console.log("integrationStatus: ", integrationStatus);
 
   useEffect(() => {
     const onInit = async () => {
@@ -134,7 +133,18 @@ const Content = () => {
 
   return (
     <>
-      <PanelSection title="Setup">
+      <PanelSection title="Setup Path">
+        {/* <PanelSectionRow>
+          <ButtonItem
+            layout="below"
+            onClick={() => {
+              Navigation.Navigate("/rifm-config");
+              Navigation.CloseSideMenus();
+            }}
+          >
+            Router
+          </ButtonItem>
+        </PanelSectionRow> */}
         <PanelSectionRow>
           <ButtonItem
             layout="below"
@@ -149,10 +159,14 @@ const Content = () => {
             <div>(thumbnails will be excluded)</div>
           </div>
         </PanelSectionRow>
-
+      </PanelSection>
+      <PanelSection title="Setup Language">
         <PanelSectionRow>
+          <div style={{ fontSize: "10px", overflowWrap: "anywhere" }}>
+            Choose Language:
+          </div>
           <DropdownItem
-            strDefaultLabel={"Select Language"}
+            strDefaultLabel={"Language"}
             rgOptions={candidateLangs}
             selectedOption={lang}
             onChange={(val) => {
@@ -164,7 +178,7 @@ const Content = () => {
         <PanelSectionRow>
           <ButtonItem layout="below" onClick={download_lang} disabled={loading}>
             <FaFolder style={{ paddingRight: "4px" }} />
-            Download Language Data - {selectedLang} (Approx. 80M)
+            Download {selectedLang} Language Data (Approx. 80MB)
           </ButtonItem>
         </PanelSectionRow>
         <PanelSectionRow>
@@ -174,13 +188,13 @@ const Content = () => {
             disabled={loading}
           >
             <FaFolder style={{ paddingRight: "4px" }} />
-            Check {selectedLang} Data Integration
+            Verify {selectedLang} Language Data Integration
           </ButtonItem>
           {Object.keys(integrationStatus).length > 0 && (
             <div>
-              {selectedLang} -
-              {Object.values(integrationStatus).filter(Boolean).length} of{" "}
-              {Object.keys(integrationStatus).length} Downloaded
+              {`${selectedLang} - ${
+                Object.values(integrationStatus).filter(Boolean).length
+              } of ${Object.keys(integrationStatus).length} Downloaded`}
             </div>
           )}
         </PanelSectionRow>
@@ -224,31 +238,31 @@ const Content = () => {
             </div>
           </PanelSectionRow>
         )}
-
-        {/*<PanelSectionRow>
-        <ButtonItem
-          layout="below"
-          onClick={() => {
-            Navigation.Navigate("/decky-plugin-test");
-            Navigation.CloseSideMenus();
-          }}
-        >
-          Router
-        </ButtonItem>
-      </PanelSectionRow>*/}
       </PanelSection>
     </>
   );
 };
 
+// const DeckyPluginRouterTest = () => {
+//   return (
+//     <SidebarNavigation
+//       title="RIFM Config"
+//       showTitle
+//       pages={[
+//         {
+//           title: "Subscriptions",
+//           content: <About />,
+//           route: "/rifm-config/subscriptions",
+//         },
+//       ]}
+//     />
+//   );
+// };
+
 export default definePlugin(() => {
   console.log(
     "Template plugin initializing, this is called once on frontend startup"
   );
-
-  // serverApi.routerHook.addRoute("/decky-plugin-test", DeckyPluginRouterTest, {
-  //   exact: true,
-  // });
 
   // Add an event listener to the "toast_event" event from the backend
   const listener = addEventListener<[test1: string]>("toast_event", (test1) => {
@@ -258,6 +272,10 @@ export default definePlugin(() => {
       body: `${test1}`,
     });
   });
+
+  // routerHook.addRoute("/rifm-config", DeckyPluginRouterTest, {
+  //   exact: true,
+  // });
 
   return {
     // The name shown in various decky menus
