@@ -13,8 +13,8 @@ import hashlib
 
 PLUGIN_PATH = decky.DECKY_PLUGIN_DIR
 BIN_PATH = os.path.join(decky.DECKY_PLUGIN_DIR, "bin")
-MODEL_PATH = '/tmp/rifm'
-WAV_PATH = '/tmp/rifm/cache.wav'
+MODEL_PATH = '/tmp/rdfm'
+WAV_PATH = '/tmp/rdfm/cache.wav'
 
 model_map = {
     "chi_sim": {
@@ -203,7 +203,7 @@ class Plugin:
     async def check_lang_model(self, lang: str) -> dict:
         try:
             decky.logger.info(f"Checking language models for {lang}")
-            lang_dir = os.path.join('/tmp/rifm', lang)
+            lang_dir = os.path.join(MODEL_PATH, lang)
             os.makedirs(lang_dir, exist_ok=True)
             model_files = model_map[lang]
             files_to_download = [
@@ -239,7 +239,7 @@ class Plugin:
                 model_files["onnx_json"]
             ]
 
-            lang_dir = os.path.join('/tmp/rifm', lang)
+            lang_dir = os.path.join(MODEL_PATH, lang)
             os.makedirs(lang_dir, exist_ok=True)
 
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 # Define the project name and output directory
-projectname="decky-rifm"
+projectname="decky-readdeckforme"
 output_dir="out"
 temp_dir="${projectname}" 
 

@@ -56,6 +56,6 @@ jobs:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         overwrite: true
         release_name: Release
-        file: ./out/decky-rifm.zip
-        asset_name: decky-rifm.zip
+        file: ./out/decky-rdfm.zip
+        asset_name: decky-rdfm.zip
         tag: latest

@@ -1,25 +1,22 @@
 /* eslint-disable react/react-in-jsx-scope */
+import { useEffect, useState } from "react";
 import {
   addEventListener,
   callable,
   definePlugin,
-  FileSelectionType,
-  openFilePicker,
   removeEventListener,
   routerHook,
   toaster,
 } from "@decky/api";
 import {
   ButtonItem,
-  DropdownItem,
   Navigation,
   PanelSection,
   PanelSectionRow,
   SidebarNavigation,
   staticClasses,
 } from "@decky/ui";
-import { useEffect, useState } from "react";
-import { FaFolder, FaShip, FaTrashAlt, FaVolumeUp } from "react-icons/fa";
+import { FaBook, FaFolder, FaTrashAlt, FaVolumeUp } from "react-icons/fa";
 import { Settings } from "./pages/Settings";
 
 const ocr_latest = callable<
@@ -125,7 +122,7 @@ const Content = () => {
           <ButtonItem
             layout="below"
             onClick={() => {
-              Navigation.Navigate("/rifm-config");
+              Navigation.Navigate("/rdfm-config");
               Navigation.CloseSideMenus();
             }}
           >
@@ -186,7 +183,7 @@ const DeckyPluginRouterTest = () => {
         {
           title: "Settings",
           content: <Settings />,
-          route: "/rifm-config/settings",
+          route: "/rdfm-config/settings",
         },
       ]}
     />
@@ -202,12 +199,12 @@ export default definePlugin(() => {
   const listener = addEventListener<[test1: string]>("toast_event", (test1) => {
     console.log("Template got toast_event with:", test1);
     toaster.toast({
-      title: "Notification From RIFM",
+      title: "Notification From RDFM",
       body: `${test1}`,
     });
   });
 
-  routerHook.addRoute("/rifm-config", DeckyPluginRouterTest, {
+  routerHook.addRoute("/rdfm-config", DeckyPluginRouterTest, {
     exact: true,
   });
 
@@ -219,12 +216,12 @@ export default definePlugin(() => {
     // The content of your plugin's menu
     content: <Content />,
     // The icon displayed in the plugin list
-    icon: <FaShip />,
+    icon: <FaBook />,
     // The function triggered when your plugin unloads
     onDismount() {
       console.log("Unloading");
       removeEventListener("toast_event", listener);
-      routerHook.removeRoute("/rifm-config");
+      routerHook.removeRoute("/rdfm-config");
     },
   };
 });

@@ -1,5 +1,5 @@
 {
-  "name": "decky-rifm",
+  "name": "decky-readdeckforme",
   "version": "0.1.0",
   "description": "A plugin that reads the text on the screen for you.",
   "type": "module",
