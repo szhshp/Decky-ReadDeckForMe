@@ -23,7 +23,7 @@
       "detail": "",
       "type": "shell",
       "group": "build",
-      "command": "pnpm run build && scp ${workspaceFolder}/dist/* ${config:deckuser}@${config:deckip}:/home/deck/homebrew/plugins/decky-rdfm/dist",
+      "command": "pnpm run build && scp ${workspaceFolder}/dist/* ${config:deckuser}@${config:deckip}:/home/deck/homebrew/plugins/${config:projectname}/dist",
       "problemMatcher": []
     },
     {
@@ -31,7 +31,7 @@
       "detail": "Show the latest log from the deck",
       "type": "shell",
       "group": "none",
-      "command": "ssh ${config:deckuser}@${config:deckip} \"cd /home/deck/homebrew/logs/decky-rdfm; cat \\\"\\$(ls -t | head -n 1)\\\"\"",
+      "command": "ssh ${config:deckuser}@${config:deckip} \"cd /home/deck/homebrew/logs/${config:projectname}; cat \\\"\\$(ls -t | head -n 1)\\\"\"",
       "problemMatcher": []
     }
   ]

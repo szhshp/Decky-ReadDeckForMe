@@ -1,8 +1,8 @@
-import React from "react";
+import React, { FC } from "react";
 import { ButtonItem, Navigation, PanelSectionRow } from "@decky/ui";
 import { FaExternalLinkAlt, FaGithubAlt } from "react-icons/fa";
 
-export const About = () => {
+export const About: FC = () => {
   return (
     <>
       <h2
@@ -41,7 +41,7 @@ export const About = () => {
             Navigation.NavigateToExternalWeb("https://szhshp.org/");
           }}
         >
-          Steam Profile
+          Website
         </ButtonItem>
       </PanelSectionRow>
 
@@ -64,7 +64,7 @@ export const About = () => {
             );
           }}
         >
-          Telegram Group
+          Github Issues
         </ButtonItem>
       </PanelSectionRow>
     </>

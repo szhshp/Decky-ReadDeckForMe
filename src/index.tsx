@@ -210,9 +210,7 @@ export default definePlugin(() => {
     });
   });
 
-  routerHook.addRoute("/rdfm-config", DeckyPluginRouterTest, {
-    exact: true,
-  });
+  routerHook.addRoute("/rdfm-config", DeckyPluginRouterTest);
 
   return {
     // The name shown in various decky menus

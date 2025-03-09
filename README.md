@@ -20,6 +20,7 @@ A Decky plugin to read the screen for you.
 ## Screenshots
 
 [Demo(Youtube)](https://www.youtube.com/watch?v=fjsc5IqgmzU?si=0S-l1QOr71csefn8)
+
 [![YouTube](http://i.ytimg.com/vi/fjsc5IqgmzU/hqdefault.jpg)](https://www.youtube.com/watch?v=fjsc5IqgmzU)
 
 ## Dev Guide
