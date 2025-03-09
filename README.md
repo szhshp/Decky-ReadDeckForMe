@@ -9,6 +9,21 @@ A Decky plugin to read the screen for you.
 - Support for English and Chinese.
 
 
+
+## Demo
+
+### Main Demo
+
+>[Youtube](http://www.youtube.com/watch?v=91gW60wfL9I)
+
+[![Main Demo](http://img.youtube.com/vi/91gW60wfL9I/0.jpg)](http://www.youtube.com/watch?v=91gW60wfL9I "Main Demo")
+
+### Game Demo
+
+>[Youtube](http://www.youtube.com/watch?v=cFGJLdHcK8o)
+
+[![Game Demo](http://img.youtube.com/vi/cFGJLdHcK8o/0.jpg)](http://www.youtube.com/watch?v=cFGJLdHcK8o "Game Demo")
+
 ## Installation
 
 
@@ -17,11 +32,6 @@ A Decky plugin to read the screen for you.
 
 > Install from Decky Store will be available soon.
 
-## Screenshots
-
-[Demo(Youtube)](https://www.youtube.com/watch?v=fjsc5IqgmzU?si=0S-l1QOr71csefn8)
-
-[![YouTube](http://i.ytimg.com/vi/fjsc5IqgmzU/hqdefault.jpg)](https://www.youtube.com/watch?v=fjsc5IqgmzU)
 
 ## Dev Guide
 
