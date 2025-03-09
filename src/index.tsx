@@ -6,6 +6,7 @@ import {
   FileSelectionType,
   openFilePicker,
   removeEventListener,
+  routerHook,
   toaster,
 } from "@decky/api";
 import {
@@ -14,10 +15,12 @@ import {
   Navigation,
   PanelSection,
   PanelSectionRow,
+  SidebarNavigation,
   staticClasses,
 } from "@decky/ui";
 import { useEffect, useState } from "react";
 import { FaFolder, FaShip, FaTrashAlt, FaVolumeUp } from "react-icons/fa";
+import { Settings } from "./pages/Settings";
 
 const ocr_latest = callable<
   [path: string, lang: string],
@@ -49,10 +52,11 @@ const Content = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [lang, setLang] = useState<string>("eng");
   const [loadedLangs, setLoadedLangs] = useState<string[]>([]);
+  console.log("loadedLangs: ", loadedLangs);
   const [screenshotPath, setScreenshotPath] = useState<string>("");
-  const [integrationStatus, setIntegrationStatus] = useState<{
-    [key: string]: boolean;
-  }>({});
+  // const [integrationStatus, setIntegrationStatus] = useState<{
+  //   [key: string]: boolean;
+  // }>({});
 
   useEffect(() => {
     const onInit = async () => {
@@ -88,53 +92,36 @@ const Content = () => {
     setLoading(false);
   };
 
-  const openFilePickerHandler = async () => {
-    Navigation.CloseSideMenus();
+  // const download_lang = async () => {
+  //   setLoading(true);
+  //   const result = await download_lang_model(lang);
+  //   console.log(result);
+  //   setLoadedLangs([...loadedLangs, lang]);
+  //   localStorage.setItem("loadedLangs", loadedLangs.join(","));
+  //   setLoading(false);
+  // };
 
-    const res = await openFilePicker(
-      FileSelectionType.FOLDER,
-      "/home/deck/.local/share/Steam/userdata",
-      true,
-      undefined,
-      undefined,
-      undefined,
-      false,
-      true
-    );
+  // const check_model_integration = async () => {
+  //   setLoading(true);
+  //   const result = await check_lang_model(lang);
+  //   setIntegrationStatus(result.output);
+  //   setLoading(false);
+  // };
 
-    if (res) {
-      localStorage.setItem("screenshotPath", res.path);
-      setScreenshotPath(res.path);
-    }
-  };
+  // const candidateLangs = [
+  //   { data: "eng", label: "English" },
+  //   { data: "chi_sim", label: "Chinese" },
+  // ];
 
-  const download_lang = async () => {
-    setLoading(true);
-    const result = await download_lang_model(lang);
-    console.log(result);
-    setLoadedLangs([...loadedLangs, lang]);
-    localStorage.setItem("loadedLangs", loadedLangs.join(","));
-    setLoading(false);
-  };
-
-  const check_model_integration = async () => {
-    setLoading(true);
-    const result = await check_lang_model(lang);
-    setIntegrationStatus(result.output);
-    setLoading(false);
-  };
-
-  const candidateLangs = [
-    { data: "eng", label: "English" },
-    { data: "chi_sim", label: "Chinese" },
-  ];
-
-  const selectedLang = candidateLangs.find((x) => x.data === lang)?.label;
+  // const selectedLang = candidateLangs.find((x) => x.data === lang)?.label;
 
   return (
     <>
-      <PanelSection title="Setup Path">
-        {/* <PanelSectionRow>
+      <PanelSection title="Configuration">
+        <PanelSectionRow>
+          <div style={{ fontSize: "10px", overflowWrap: "anywhere" }}>
+            Please check the configuration before using the actions below.
+          </div>
           <ButtonItem
             layout="below"
             onClick={() => {
@@ -142,61 +129,8 @@ const Content = () => {
               Navigation.CloseSideMenus();
             }}
           >
-            Router
+            Language Settings
           </ButtonItem>
-        </PanelSectionRow> */}
-        <PanelSectionRow>
-          <ButtonItem
-            layout="below"
-            onClick={openFilePickerHandler}
-            disabled={loading}
-          >
-            <FaFolder style={{ paddingRight: "4px" }} />
-            Select Screenshot Folder
-          </ButtonItem>
-          <div style={{ fontSize: "10px", overflowWrap: "anywhere" }}>
-            <div>Path: {screenshotPath}</div>
-            <div>(thumbnails will be excluded)</div>
-          </div>
-        </PanelSectionRow>
-      </PanelSection>
-      <PanelSection title="Setup Language">
-        <PanelSectionRow>
-          <div style={{ fontSize: "10px", overflowWrap: "anywhere" }}>
-            Choose Language:
-          </div>
-          <DropdownItem
-            strDefaultLabel={"Language"}
-            rgOptions={candidateLangs}
-            selectedOption={lang}
-            onChange={(val) => {
-              setLang(val.data);
-              localStorage.setItem("lang", val.data);
-            }}
-          />
-        </PanelSectionRow>
-        <PanelSectionRow>
-          <ButtonItem layout="below" onClick={download_lang} disabled={loading}>
-            <FaFolder style={{ paddingRight: "4px" }} />
-            Download {selectedLang} Language Data (Approx. 80MB)
-          </ButtonItem>
-        </PanelSectionRow>
-        <PanelSectionRow>
-          <ButtonItem
-            layout="below"
-            onClick={check_model_integration}
-            disabled={loading}
-          >
-            <FaFolder style={{ paddingRight: "4px" }} />
-            Verify {selectedLang} Language Data Integration
-          </ButtonItem>
-          {Object.keys(integrationStatus).length > 0 && (
-            <div>
-              {`${selectedLang} - ${
-                Object.values(integrationStatus).filter(Boolean).length
-              } of ${Object.keys(integrationStatus).length} Downloaded`}
-            </div>
-          )}
         </PanelSectionRow>
       </PanelSection>
       <PanelSection title="Actions">
@@ -213,7 +147,7 @@ const Content = () => {
         <PanelSectionRow>
           <ButtonItem layout="below" onClick={ocr} disabled={loading}>
             <FaVolumeUp style={{ paddingRight: "4px" }} />
-            {loading ? "Loading..." : "Read It For Me"}
+            {loading ? "Loading..." : "Read Deck For Me"}
           </ButtonItem>
         </PanelSectionRow>
         <PanelSectionRow>
@@ -243,21 +177,21 @@ const Content = () => {
   );
 };
 
-// const DeckyPluginRouterTest = () => {
-//   return (
-//     <SidebarNavigation
-//       title="RIFM Config"
-//       showTitle
-//       pages={[
-//         {
-//           title: "Subscriptions",
-//           content: <About />,
-//           route: "/rifm-config/subscriptions",
-//         },
-//       ]}
-//     />
-//   );
-// };
+const DeckyPluginRouterTest = () => {
+  return (
+    <SidebarNavigation
+      title="ReadDeckForMe"
+      showTitle
+      pages={[
+        {
+          title: "Settings",
+          content: <Settings />,
+          route: "/rifm-config/settings",
+        },
+      ]}
+    />
+  );
+};
 
 export default definePlugin(() => {
   console.log(
@@ -273,15 +207,15 @@ export default definePlugin(() => {
     });
   });
 
-  // routerHook.addRoute("/rifm-config", DeckyPluginRouterTest, {
-  //   exact: true,
-  // });
+  routerHook.addRoute("/rifm-config", DeckyPluginRouterTest, {
+    exact: true,
+  });
 
   return {
     // The name shown in various decky menus
-    name: "Test Plugin",
+    name: "Decky-ReadDeckForMe",
     // The element displayed at the top of your plugin's menu
-    titleView: <div className={staticClasses.Title}>Read It For Me</div>,
+    titleView: <div className={staticClasses.Title}>Read Deck For Me</div>,
     // The content of your plugin's menu
     content: <Content />,
     // The icon displayed in the plugin list
@@ -290,7 +224,7 @@ export default definePlugin(() => {
     onDismount() {
       console.log("Unloading");
       removeEventListener("toast_event", listener);
-      // serverApi.routerHook.removeRoute("/decky-plugin-test");
+      routerHook.removeRoute("/rifm-config");
     },
   };
 });

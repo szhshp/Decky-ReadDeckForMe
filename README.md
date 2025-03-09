@@ -1,4 +1,4 @@
-# Decky Plugin - ReadItForMe 
+# Read Deck For Me
 
 > Under Development, but feel free to try it out!
 

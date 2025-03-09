@@ -87,6 +87,21 @@ class Plugin:
             decky.logger.error(f"Output: {e.output}")
             decky.logger.error(f"Stderr: {e.stderr}")
 
+    # async def stop_tts(self) -> None:
+    #     try:
+    #         decky.logger.info("Stopping TTS")
+    #         command = f'pkill -f paplay'
+    #         subprocess.run(command, shell=True, capture_output=True, text=True, check=True)
+    #         decky.logger.info("TTS stopped")
+
+    #     except subprocess.CalledProcessError as e:
+    #         decky.logger.error(f"Command failed with error: {e}")
+    #         decky.logger.error(f"Return code: {e.returncode}")
+    #         decky.logger.error(f"Output: {e.output}")
+    #         decky.logger.error(f"Stderr: {e.stderr}")
+    #     except Exception as e:
+    #         decky.logger.error(f"Error: {e}")
+
     async def delete_latest(self, path:str) -> dict:
         decky.logger.info("Delete Latest - Start")
         try:
