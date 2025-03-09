@@ -4,6 +4,7 @@
     "deckuser": "deck",
     "deckkey": "-i ${env:HOME}/.ssh/id_rsa",
     "deckdir": "/home/deck",
+    "projectname": "decky-rdfm",
     "filename": "decky-rdfm.zip",
     "python.analysis.extraPaths": [
         "./py_modules"
