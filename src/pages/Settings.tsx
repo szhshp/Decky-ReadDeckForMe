@@ -10,11 +10,6 @@ import {
 } from "@decky/ui";
 import { callable, FileSelectionType, openFilePicker } from "@decky/api";
 
-const get_latest = callable<
-  [path: string],
-  { status: string; output: string; base64: string }
->("get_latest");
-
 const download_lang_model = callable<
   [lang: string],
   { status: string; output: string }

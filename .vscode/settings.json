@@ -1,0 +1,38 @@
+{
+    "deckip": "192.168.1.11",
+    "deckport": "22",
+    "deckuser": "deck",
+    "deckkey": "-i ${env:HOME}/.ssh/id_rsa",
+    "deckdir": "/home/deck",
+    "filename": "decky-rdfm.zip",
+    "python.analysis.extraPaths": [
+        "./py_modules"
+    ],
+    "workbench.colorCustomizations": {
+        "activityBar.activeBackground": "#772f16",
+        "activityBar.background": "#772f16",
+        "activityBar.foreground": "#e7e7e7",
+        "activityBar.inactiveForeground": "#e7e7e799",
+        "commandCenter.border": "#e7e7e799",
+        "editorGroup.border": "#772f16",
+        "panel.border": "#772f16",
+        "sash.hoverBorder": "#772f16",
+        "sideBar.border": "#772f16",
+        "statusBar.background": "#4c1e0e",
+        "statusBar.border": "#4c1e0e",
+        "statusBar.debuggingBackground": "#0e3c4c",
+        "statusBar.debuggingBorder": "#0e3c4c",
+        "statusBar.debuggingForeground": "#e7e7e7",
+        "statusBar.foreground": "#e7e7e7",
+        "statusBarItem.hoverBackground": "#772f16",
+        "statusBarItem.remoteBackground": "#4c1e0e",
+        "statusBarItem.remoteForeground": "#e7e7e7",
+        "tab.activeBorder": "#772f16",
+        "titleBar.activeBackground": "#4c1e0e",
+        "titleBar.activeForeground": "#e7e7e7",
+        "titleBar.border": "#4c1e0e",
+        "titleBar.inactiveBackground": "#4c1e0e99",
+        "titleBar.inactiveForeground": "#e7e7e799"
+    },
+    "peacock.color": "#4c1e0e"
+}

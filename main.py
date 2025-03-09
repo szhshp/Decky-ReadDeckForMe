@@ -295,15 +295,6 @@ class Plugin:
     async def _main(self):
         self.loop = asyncio.get_event_loop()
 
-        # Check if /bin/piper exists
-        if not os.path.exists(f"{BIN_PATH}/piper"):
-            # Extract /bin/file to /bin
-            command = f"tar -xvf {BIN_PATH}/piper_linux_x86_64.tar.gz -C {BIN_PATH}"
-            result = subprocess.run(command, shell=True, capture_output=True, text=True, check=True)
-            decky.logger.info(f"Extraction result: {result.stdout}")
-        else:
-            decky.logger.info("/bin/piper already exists, skipping extraction")
-
         # Player: Set the XDG_RUNTIME_DIR environment variable
         os.environ['XDG_RUNTIME_DIR'] = "/run/user/1000"
 

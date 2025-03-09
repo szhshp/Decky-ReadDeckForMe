@@ -18,6 +18,7 @@ import {
 } from "@decky/ui";
 import { FaBook, FaFolder, FaTrashAlt, FaVolumeUp } from "react-icons/fa";
 import { Settings } from "./pages/Settings";
+import { About } from "./pages/About";
 
 const ocr_latest = callable<
   [path: string, lang: string],
@@ -184,6 +185,11 @@ const DeckyPluginRouterTest = () => {
           title: "Settings",
           content: <Settings />,
           route: "/rdfm-config/settings",
+        },
+        {
+          title: "About",
+          content: <About />,
+          route: "/rdfm-config/about",
         },
       ]}
     />

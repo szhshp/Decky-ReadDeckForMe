@@ -1,8 +1,8 @@
 #!/bin/bash
 # Define the project name and output directory
-projectname="decky-readdeckforme"
+fileName="decky-rdfm"
 output_dir="out"
-temp_dir="${projectname}" 
+temp_dir="${fileName}" 
 
 # Ensure the script is run from the root of the project, not from the /scripts directory
 set -e
@@ -35,10 +35,10 @@ mkdir -p $temp_dir
 mv $output_dir/* $temp_dir/
 
 # Create a zip file of the temporary directory
-zip -r "${projectname}.zip" $temp_dir
+zip -r "${fileName}.zip" $temp_dir
 
 # Move the zip file to the output directory
-mv "${projectname}.zip" $output_dir/
+mv "${fileName}.zip" $output_dir/
 
 # Clean up the temporary directory
 rm -rf $temp_dir
